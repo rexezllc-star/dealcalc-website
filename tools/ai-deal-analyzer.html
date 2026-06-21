@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DEALCALC V4 ANALYZER: Multi-Strategy Deal Analyzer V2 with PDF upload. -->
+<!-- DEALCALC V5 ANALYZER: Auto-detects property type and suggested analysis from uploaded PDFs, then applies strategy-specific scoring. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -28,9 +28,9 @@
 </header>
 <main>
   <section class="hero">
-    <p class="eyebrow">Multi-Strategy Deal Analyzer V2</p>
-    <h1>Analyze wholesale deals, flips, rentals, land, and homeowner equity.</h1>
-    <p>Choose your strategy, enter the numbers, or upload a PDF. DealCalc estimates profit, equity, risk, MAO, and the next best action.</p>
+    <p class="eyebrow">AI Deal Analyzer V5</p>
+    <h1>Upload a CMA, MLS sheet, flyer, or deal packet. DealCalc detects the property type, suggests the best analysis, and scores the deal.</h1>
+    <p>Upload a PDF or enter numbers manually. DealCalc separates property type from investment strategy, extracts key data, estimates profit/equity/cash flow, and recommends the next best action.</p>
   </section>
 
   <section class="section tool wide-tool">
@@ -38,13 +38,26 @@
       <h2>Deal Inputs</h2>
       <div class="form-grid">
         <div>
-          <label>Analysis Type</label>
+          <label>Property Type</label>
+          <select id="propertyType" onchange="updateAnalyzerMode()">
+            <option value="auto">Auto-detect from PDF / inputs</option>
+            <option value="land">Vacant Land</option>
+            <option value="sfr">Single Family / Residential</option>
+            <option value="multi">Multifamily</option>
+            <option value="condo">Condo / Townhome</option>
+            <option value="unknown">Other / Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label>Analysis Goal</label>
           <select id="analysisType" onchange="updateAnalyzerMode()">
+            <option value="auto">Auto-suggest best analysis</option>
             <option value="wholesale">Wholesale Assignment</option>
             <option value="flip">Fix & Flip</option>
             <option value="rental">Rental / Buy & Hold</option>
             <option value="land">Vacant Land Flip</option>
             <option value="homeowner">Homeowner Equity</option>
+            <option value="retail">Retail Listing / Overpay Check</option>
           </select>
         </div>
         <div>
@@ -52,7 +65,11 @@
           <input id="propertyLabel" placeholder="123 Main St or Deal A">
         </div>
         <div>
-          <label>Purchase Price / Current Value</label>
+          <label>Listing Price / Asking Price</label>
+          <input id="listingPrice" type="number" placeholder="395000">
+        </div>
+        <div>
+          <label>Purchase Price / Current Value / Offer</label>
           <input id="purchasePrice" type="number" placeholder="110000">
         </div>
         <div>
@@ -64,7 +81,7 @@
           <input id="analyzerRepairs" type="number" placeholder="45000">
         </div>
         <div>
-          <label>Assignment Fee / Desired Profit</label>
+          <label>Assignment Fee / Desired Profit / Cash Invested</label>
           <input id="assignmentFee" type="number" placeholder="15000">
         </div>
         <div>
@@ -95,25 +112,26 @@
 
       <div class="upload-panel">
         <h3>Optional PDF Upload</h3>
-        <p class="muted">Upload a property flyer, MLS printout, seller packet, or deal sheet. DealCalc will read the text in your browser and try to prefill numbers it recognizes.</p>
+        <p class="muted">Upload a CMA, MLS printout, Zillow flyer, property flyer, seller packet, or OM. DealCalc reads the PDF in your browser, detects whether it is land or residential, suggests the right analysis type, and pre-fills recognized numbers.</p>
         <input id="dealPdf" type="file" accept="application/pdf" onchange="handleDealPdfUpload(event)">
         <p id="pdfStatus" class="muted">No PDF uploaded yet.</p>
+        <div id="extractionSummary" class="extract-box hidden-field"></div>
         <textarea id="documentNotes" placeholder="Extracted PDF text or notes will appear here. You can also paste listing details, seller notes, rent estimates, tax notes, or repair notes."></textarea>
       </div>
 
-      <p class="cta-row"><button class="btn" onclick="analyzeDealV2()">Analyze Deal</button><button class="btn secondary" onclick="clearAnalyzer()" type="button">Clear</button></p>
+      <p class="cta-row"><button class="btn" onclick="analyzeDealV5()">Analyze Deal</button><button class="btn secondary" onclick="clearAnalyzer()" type="button">Clear</button></p>
     </div>
 
     <aside class="result-box" id="analysisResult">
       <h3>Deal analysis will appear here.</h3>
-      <p class="muted">This version supports multiple user types: wholesalers, flippers, rental investors, land investors, and homeowners estimating equity.</p>
+      <p class="muted">Upload a PDF to auto-detect property type and recommended analysis, or manually choose your strategy.</p>
     </aside>
   </section>
 
   <section class="section grid three-info">
     <div class="card"><h2>For Investors</h2><p class="muted">Estimate MAO, spread, flip profit, rental cash flow, and land resale upside.</p></div>
     <div class="card"><h2>For Homeowners</h2><p class="muted">Estimate current equity, sale proceeds, and whether selling or refinancing may make sense.</p></div>
-    <div class="card"><h2>For PDFs</h2><p class="muted">Client-side PDF extraction works best with text-based PDFs. Scanned image PDFs may need manual entry.</p></div>
+    <div class="card"><h2>For PDFs</h2><p class="muted">Optimized for CMA reports, MLS printouts, listing flyers, OMs, and seller packets. Scanned image PDFs may still need manual entry.</p></div>
   </section>
 </main>
 <footer class="site-footer">
