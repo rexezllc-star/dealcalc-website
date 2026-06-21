@@ -1,3 +1,3 @@
-DealCalc.io V27 update
+DealCalc Full Update V30
 
-Upload the full contents of this folder to the GitHub repository root and overwrite existing files. V27 uses /assets/js/main-v27.js on the AI Analyzer page.
+Upload all files to GitHub root and overwrite existing files. V30 fixes final analyzer rendering: Gross Rent Yield, duplicate Investor Bottom Line, and rentability score render.
