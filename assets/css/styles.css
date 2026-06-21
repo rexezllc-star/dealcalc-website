@@ -17,3 +17,6 @@
 .auth-note{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);padding:.85rem;border-radius:14px}
 .site-header nav a[data-auth-link="true"]{border:1px solid rgba(245,185,88,.35);border-radius:999px;padding:.45rem .8rem;color:var(--accent)}
 @media print{.site-header,.site-footer,.cta-row,#saveDealMsg{display:none!important}.card,.result-box{box-shadow:none;border:1px solid #ddd}.analyzer-layout{display:block}}
+
+/* DealCalc Calculator V12 */
+.calc-link-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.calc-link-row a{display:inline-flex;padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:#0b111d;color:#fff;text-decoration:none;font-weight:700}.calc-link-row a:hover{border-color:var(--gold);color:var(--gold)}.insight{border-left:4px solid var(--gold);padding:12px 14px;background:#111827;border-radius:12px;margin:12px 0;color:#dbe4f3}.insight.watch{border-left-color:var(--gold)}.calculator-v12 .result-box .score{font-size:44px}.calculator-v12 .card h2{margin-top:0}

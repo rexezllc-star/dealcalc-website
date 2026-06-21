@@ -1,71 +1,40 @@
-# DealCalc.io Full Update V9 — Accounts + Saved Deals
+# DealCalc Full Update V12
 
-Upload/replace the full contents of this folder into your GitHub repository root, then commit and push.
+This is the one-upload fix for the calculator folder issue.
 
-## What V9 Adds
+## What changed
 
-- Login / Create Account page: `/auth.html`
-- Dashboard page: `/dashboard.html`
-- Supabase configuration file: `/assets/js/supabase-config.js`
-- Supabase authentication logic: `/assets/js/auth.js`
-- Save Deal button in AI Deal Analyzer results
-- Saved deal history in Dashboard
-- Local browser fallback if Supabase is not configured yet
-- Contact page email link: `info@dealcalc.io`
-- Contact reason dropdown
-- Footer email link across pages
+- Rebuilt the live `/calculator/` folder with 10 unique calculator pages.
+- Mirrored the same fixed pages into `/calculators/` so the duplicate folder no longer causes confusion.
+- Updated `calculators.html` as the main calculator directory.
+- Added `/calculator/index.html` and `/calculators/index.html` directory pages.
+- Added `assets/js/calculators-v12.js` with unique formulas for every calculator.
+- Updated styling for calculator navigation links and result insight boxes.
 
-## Important Supabase Setup
+## Important upload instruction
 
-1. Create a free Supabase project.
-2. Go to Project Settings → API.
-3. Copy:
-   - Project URL
-   - anon public key
-4. Open:
+Upload the CONTENTS of this folder to the GitHub repository root and choose replace/overwrite when prompted.
 
-```text
-assets/js/supabase-config.js
-```
+After upload, the live page:
+`/calculator/cap-rate-calculator.html`
+should show fields for:
+- Property Value / Purchase Price
+- Annual Gross Rent
+- Vacancy %
+- Annual Operating Expenses
+- Target Cap Rate %
 
-5. Replace:
+It should NOT show ARV / Repair Costs / Assignment Fee / Rule %.
 
-```text
-REPLACE_WITH_SUPABASE_PROJECT_URL
-REPLACE_WITH_SUPABASE_ANON_PUBLIC_KEY
-```
+## Files/folders that must be replaced
 
-6. In Supabase SQL Editor, run:
+- `calculator/`
+- `calculators/`
+- `calculators.html`
+- `assets/js/calculators-v12.js`
+- `assets/css/styles.css`
 
-```text
-SUPABASE_SETUP.sql
-```
+## Verification markers
 
-7. In Supabase Auth settings, add these redirect URLs:
-
-```text
-https://www.dealcalc.io/dashboard.html
-https://dealcalc.io/dashboard.html
-http://localhost:3000/dashboard.html
-```
-
-8. Optional: enable Google provider in Supabase Auth Providers.
-
-## Files to Confirm After Upload
-
-```text
-auth.html
-dashboard.html
-assets/js/auth.js
-assets/js/supabase-config.js
-SUPABASE_SETUP.sql
-tools/ai-deal-analyzer.html
-assets/js/main.js
-assets/css/styles.css
-contact.html
-sitemap.xml
-```
-
-## How It Works Before Supabase Is Configured
-
-If Supabase is not configured yet, users can still click Save Deal and the deal will save locally in their browser. Once Supabase is configured and users log in, deals save to the cloud.
+Each fixed calculator page contains this marker near the top:
+`DEALCALC CALCULATOR V12`
