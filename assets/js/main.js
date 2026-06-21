@@ -311,6 +311,58 @@ function applyDetectedData(data){
   }
 }
 function getDetectedMeta(){try{return JSON.parse(document.getElementById('documentNotes')?.dataset.detected||'{}')}catch(e){return {}}}
+
+function metricLine(label,value,sub=''){
+  return `<div class="metric"><span class="muted">${escapeHtml(label)}</span><strong>${value}</strong>${sub?`<small>${escapeHtml(sub)}</small>`:''}</div>`;
+}
+function getInputSnapshot(){
+  const x=getInputs(); const meta=getDetectedMeta();
+  return {x,meta};
+}
+function valuationConfidence(meta,x){
+  let score=35;
+  if(meta.valueSource) score+=20;
+  if(meta.market && (meta.market.saleCompCount||meta.market.landCompCount)) score+=18;
+  if(meta.market && meta.market.ppsfMedian) score+=10;
+  if(x.value && x.listing) score+=8;
+  if(meta.status && meta.status!=='Unknown') score+=5;
+  if(meta.estimatedValue && meta.underwritingValue && Math.abs(meta.estimatedValue-meta.underwritingValue)>meta.underwritingValue*.35) score-=18;
+  return clampScore(score);
+}
+function marketRead(meta,x){
+  const m=meta.market||{}; const rows=[];
+  if(x.propertyType==='land'){
+    if(m.landCompMedian) rows.push(['Median land sold comp',money(m.landCompMedian),`${m.landCompCount||0} detected land comp prices`]);
+    if(m.landListingMedian) rows.push(['Median land active listing',money(m.landListingMedian),`${m.landListingCount||0} detected active land prices`]);
+    if(meta.estimatedValue && meta.underwritingValue) rows.push(['Reported vs comp value',`${money(meta.estimatedValue)} / ${money(meta.underwritingValue)}`,'Estimated values can be distorted on vacant land']);
+  } else {
+    if(m.ppsfMedian && meta.underwritingValue) rows.push(['Comp $/SqFt valuation',money(meta.underwritingValue),`Median sold $/sqft: ${money(m.ppsfMedian)}`]);
+    if(m.saleCompMedian) rows.push(['Median sold comp',money(m.saleCompMedian),`${m.saleCompCount||0} detected sales prices`]);
+    if(m.activeListingMedian) rows.push(['Median active listing',money(m.activeListingMedian),`${m.activeListingCount||0} detected listing prices`]);
+  }
+  if(x.listing && x.value){
+    const gap=x.listing-x.value; rows.push(['Price gap',gap>=0?`${money(gap)} over value`:`${money(Math.abs(gap))} under value`, gap>=0?'Possible overpay risk':'Possible embedded equity/spread']);
+  }
+  if(x.rent && (x.listing||x.price)){
+    const gy=safeDiv(x.rent*12,(x.listing||x.price)); rows.push(['Gross rent yield',pct(gy),'Before vacancy, repairs, management, debt service']);
+  }
+  if(meta.status) rows.push(['Listing status',meta.status,meta.status==='Pending'?'Availability may be limited':'Confirm current availability']);
+  return rows;
+}
+function buildDataQuality(meta,x){
+  const c=valuationConfidence(meta,x); const cls=c>=80?'good':c>=60?'watch':'bad';
+  const label=c>=80?'High confidence':c>=60?'Usable with verification':'Needs verification';
+  return `<div class="data-quality ${cls}"><strong>${label}</strong><span>${c}/100 data confidence</span><small>Based on extracted value source, comps, property type, status, and conflicting signals.</small></div>`;
+}
+function buildInvestorSections(x,best,scores){
+  const meta=getDetectedMeta();
+  const mr=marketRead(meta,x).slice(0,6).map(([k,v,s])=>metricLine(k,v,s)).join('');
+  const red=(meta.redFlags||[]).concat(best.score<60?['Score is weak under current assumptions; repricing is likely required.']:[]).slice(0,5);
+  const opp=(meta.opportunities||[]).slice(0,4);
+  const riskHtml=red.length?`<h3>Risk flags</h3><ul class="small-list risk-list">${red.map(r=>`<li>${escapeHtml(r)}</li>`).join('')}</ul>`:'';
+  const oppHtml=opp.length?`<h3>Potential upside</h3><ul class="small-list opportunity-list">${opp.map(o=>`<li>${escapeHtml(o)}</li>`).join('')}</ul>`:'';
+  return `${buildDataQuality(meta,x)}${mr?`<h3>Market & value read</h3><div class="metric-grid market-read">${mr}</div>`:''}${riskHtml}${oppHtml}`;
+}
 function insightBullets(x,best,scores){
   const meta=getDetectedMeta(); const bullets=[];
   if(meta.valueSource && x.value) bullets.push(`Primary value source used: ${meta.valueSource}. This matters because CMA estimated values can conflict with actual sold comps.`);
@@ -335,18 +387,21 @@ function analyzeDealV6(manual=false){
   const bullets=insightBullets(x,best,scores).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
   const steps=nextSteps(x,best).map(s=>`<li>${escapeHtml(s)}</li>`).join('');
   const action=best.score>=80?'Worth Deeper Underwriting':best.score>=65?'Proceed Carefully':best.score>=50?'Renegotiate / Verify First':'Likely Pass Unless Repriced';
-  const sourceNote=meta.valueSource?`<p class="source-note"><strong>Valuation source:</strong> ${escapeHtml(meta.valueSource)}${meta.confidence?` · ${meta.confidence}% extraction confidence`:''}</p>`:'';
+  const sourceNote=meta.valueSource?`<p class="source-note"><strong>Primary value source:</strong> ${escapeHtml(meta.valueSource)}${meta.confidence?` · ${meta.confidence}% extraction confidence`:''}</p>`:'';
+  const investorSections=buildInvestorSections(x,best,scores);
   box.innerHTML=`
     <div class="report-header">
-      <div><p class="eyebrow">Deal Brief V7</p><h2>${escapeHtml(x.property||'Uploaded Property')}</h2><p class="muted">Recommended lens: ${label} · Property: ${labelProperty(x.propertyType)}</p>${sourceNote}</div>
+      <div><p class="eyebrow">Investor Deal Brief</p><h2>${escapeHtml(x.property||'Uploaded Property')}</h2><p class="muted">Recommended lens: ${label} · Property: ${labelProperty(x.propertyType)}</p>${sourceNote}</div>
       <div class="score-badge"><strong>${best.score}</strong><span>/100</span></div>
     </div>
     <div class="verdict ${best.score>=75?'good':best.score>=55?'watch':'bad'}"><strong>${action}</strong><span>${escapeHtml(best.headline)}</span></div>
     <div class="metric-grid">${metrics}</div>
+    ${investorSections}
     <h3>Strategy Comparison</h3><div class="strategy-grid">${compCards}</div>
     <h3>Information worth knowing</h3><ul class="small-list">${bullets}</ul>
     <h3>Next checks</h3><ol class="small-list">${steps}</ol>
-    <p class="muted tiny-note">Educational estimate only. Values are extracted from the uploaded document and should be verified against public records, sold comps, inspection, title, financing, and local market review.</p>
+    <details class="notes-details"><summary>Why this result was generated</summary><p class="muted">DealCalc triangulates values from the strongest extracted source available: land-only comps for vacant land, sold comp medians or $/sqft for houses, rent and expense assumptions for rentals, and equity or loan data for homeowner analysis. The output is a screening report, not a substitute for inspection, appraisal, title, zoning, or lender review.</p></details>
+    <p class="muted tiny-note">Educational estimate only. Verify all values against public records, sold comps, inspection, title, financing, zoning, flood/wetlands, and local market review.</p>
     <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Export / Print Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
   trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:risk,manual:manual,value_source:meta.valueSource||''});
 }
