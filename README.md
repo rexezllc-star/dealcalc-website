@@ -1,8 +1,3 @@
-DealCalc.io v5 launch package
+# DealCalc.io v6 Full Launch
 
-Files:
-- index.html: polished single-page real estate calculator platform with 10 live calculators
-- robots.txt: allows indexing and points to sitemap
-- sitemap.xml: submit in Google Search Console
-
-Upload all files to the GitHub repo root and commit. Vercel will deploy automatically.
+Includes dark premium theme, 10 calculators, Google Analytics, event tracking, legal pages, Learn hub, 5 starter articles, robots.txt, and sitemap.xml.
