@@ -1465,3 +1465,96 @@ function dcDealVerdict(x,best,meta){
   };
 })();
 /* ===== End DealCalc V23 Hard Reliability Patch ===== */
+
+/* ===== DealCalc V24 Underwriting Intelligence Patch =====
+   Purpose: scoring/interpretation cleanup after V23 fixed extraction.
+   Adds labeled value bands, explicit overpricing explainer, clearer equity,
+   gross yield, smarter strategy ordering, and less punitive retail scores. */
+function dcV24ValueBand(meta){
+  const vs=meta.valueStack||{};
+  return {
+    conservative: vs.low || Math.round((meta.underwritingValue||0)*0.96),
+    supported: meta.underwritingValue || vs.dealcalc || 0,
+    upper: vs.high || Math.round((meta.underwritingValue||0)*1.10)
+  };
+}
+function dcV24GrossYield(x){return x.rent && (x.listing||x.price) ? safeDiv(x.rent*12,(x.listing||x.price)) : 0;}
+function scoreRetail(x){
+  const meta=getDetectedMeta();
+  const price=x.listing||x.price, value=x.value||price, premium=safeDiv(price-value,value);
+  const equity=meta.estimatedEquity || (value-(x.loan||0));
+  const yieldPct=dcV24GrossYield(x);
+  let score=58-(premium*70); // V24: overpriced retail is weak, but not automatically zero.
+  if(/Updated|Ready|Renovated/i.test(meta.condition?.condition||'')) score+=10;
+  if(meta.status==='Pending') score+=4;
+  if(meta.compReliability?.score>=70) score+=4;
+  if(yieldPct>.09) score+=10; else if(yieldPct>.07) score+=5; else if(yieldPct>0) score-=2;
+  if(premium>.30) score-=8;
+  score=clampScore(score);
+  return {type:'retail',score,metrics:[['Value Gap',money(value-price)],['Price vs Value',pct(premium)],['Reported Equity',equity?money(equity):'N/A'],['Gross Rent Yield',yieldPct?pct(yieldPct):'N/A']],headline:premium>.30?'Overpriced, but not necessarily a bad property. Verify whether renovated condition supports the premium.':premium>.12?'Priced above supported value; negotiate or verify premium comps.':premium>0?'Slightly above value.':premium>-0.08?'Near fair value.':'Potentially below value.',risk:premium>.30?'High':premium>.12?'Moderate':'Low'};
+}
+function dcStrategyCards(sorted,x,meta,best){
+  // V24: retail listing workflows should rank the overpay check ahead of rental when the document is clearly a listing/CMA.
+  const orderWeight={homeowner:0,retail:0,rental:0,flip:0,wholesale:0,land:0};
+  if(meta.status || meta.listingPrice){orderWeight.retail+=18;}
+  if(meta.estimatedEquity||meta.mortgageBalance){orderWeight.homeowner+=10;}
+  if(x.rent){orderWeight.rental+=2;}
+  const ranked=sorted.slice().sort((a,b)=>((b.score+(orderWeight[b.type]||0))-(a.score+(orderWeight[a.type]||0))));
+  return ranked.slice(0,6).map((s,i)=>`<div class="strategy-card ${s.type===best.type?'active':''}"><span>#${i+1} ${labelAnalysis(s.type)}</span><strong>${s.score}</strong><small>${s.risk||baseRisk(s.score)} risk</small><p class="tiny-note">${escapeHtml(dcStrategyReason(s.type,x,meta,s.score))}</p></div>`).join('');
+}
+function dcV24WhyOverpriced(x,meta){
+  const price=x.listing||x.price||0, value=x.value||meta.underwritingValue||0;
+  if(!price||!value||price<=value*1.08)return '';
+  const gap=price-value, premium=safeDiv(gap,value), median=meta.avgSalePrice||0;
+  return `<h3>Why DealCalc thinks this is overpriced</h3><div class="card insight-card"><div class="metric-grid"><div class="metric"><span class="muted">Ask price</span><strong>${money(price)}</strong></div><div class="metric"><span class="muted">Supported value</span><strong>${money(value)}</strong></div><div class="metric"><span class="muted">Difference</span><strong>${money(gap)}</strong></div><div class="metric"><span class="muted">Required premium</span><strong>${pct(premium)}</strong></div>${median?`<div class="metric"><span class="muted">Comp median reference</span><strong>${money(median)}</strong></div>`:''}</div><p class="muted">DealCalc is not saying the property is worthless. It is saying the current price requires premium comps, renovation quality, or unique buyer demand to justify paying materially above the CMA-supported value stack.</p></div>`;
+}
+function dcIntelligenceSections(x,best,scores){
+  const meta=getDetectedMeta();
+  const motivation=meta.sellerMotivation||0, comp=meta.compReliability||{}, ren=meta.renovationPremium||{}, neg=meta.negotiation||{}, eq=meta.equityReality||{}, pos=meta.marketPosition||{};
+  const band=dcV24ValueBand(meta); const yieldPct=dcV24GrossYield(x);
+  const hidden=dcEscapeList(meta.hiddenSignals||[]);
+  const fatigue=(meta.listingHistory?.fatigueSignals||[]).slice(0,6);
+  const compNotes=[];
+  if(comp.usable||comp.total) compNotes.push(`${comp.usable||0} usable comp signals from ${comp.total||0} detected market/listing signals.`);
+  if(comp.excluded) compNotes.push(`${comp.excluded} weak/outlier signals should not drive value without review.`);
+  const renList=dcEscapeList(ren.detected||[]);
+  const rows=[];
+  rows.push(metricLine('Value band',`${money(band.conservative)} – ${money(band.upper)}`,`Conservative ${money(band.conservative)} · Supported ${money(band.supported)} · Upper comp screen ${money(band.upper)}`));
+  if(yieldPct) rows.push(metricLine('Gross rent yield',pct(yieldPct),`Annual rent ${money((x.rent||0)*12)} ÷ price ${money(x.listing||x.price||0)} before expenses and debt service.`));
+  if(motivation) rows.push(metricLine('Seller motivation',`${motivation}/100`, motivation>=75?'Likely negotiable if not already locked in pending status':motivation>=55?'Moderate negotiation signals':'Limited visible motivation'));
+  if(pos.ask) rows.push(metricLine('Market position',pos.position,`${money(pos.ask)} ask vs ${money(pos.median)} median reference (${dcPctNumber(pos.premium)})`));
+  if(neg.stretch) rows.push(metricLine('Offer framework',`${money(neg.aggressive)} – ${money(neg.stretch)}`,`Aggressive ${money(neg.aggressive)} · Reasonable ${money(neg.reasonable)} · Stretch ${money(neg.stretch)}`));
+  if(eq.equity) rows.push(metricLine('Equity reality',`${money(eq.equity)} raw`,`${money(eq.sellCost)} est. selling costs · ${money(eq.net)} estimated net proceeds · ${eq.flexibility}`));
+  if(comp.score) rows.push(metricLine('Comp reliability',`${comp.score}/100`,compNotes.join(' ')));
+  if(ren.actualPremium||ren.updated) rows.push(metricLine('Renovation premium',dcPctNumber(ren.actualPremium||0),`Typical updated-home allowance ${dcPctNumber(ren.expectedLow||0)}–${dcPctNumber(ren.expectedHigh||0)}. ${ren.conclusion||''}`));
+  const core=`<h3>Investor intelligence</h3><div class="metric-grid market-read intelligence-grid">${rows.join('')}</div>`;
+  const hiddenHtml=hidden?`<h3>Hidden signals</h3><ul class="small-list hidden-signal-list">${hidden}</ul><p class="muted">Investor read: these signals suggest whether this is a pricing problem, a negotiation problem, or simply a retail buyer opportunity.</p>`:'';
+  const fatigueHtml=fatigue.length?`<h3>Seller fatigue evidence</h3><ul class="small-list opportunity-list">${dcEscapeList(fatigue)}</ul>`:'';
+  const renHtml=renList?`<h3>Renovation read</h3><ul class="small-list opportunity-list">${renList}</ul><p class="muted">Expected renovation premium: ${dcPctNumber(ren.expectedLow||0)}–${dcPctNumber(ren.expectedHigh||0)}. Current premium requested: ${dcPctNumber(ren.actualPremium||0)}.</p>`:'';
+  return core + dcV24WhyOverpriced(x,meta) + hiddenHtml + fatigueHtml + renHtml;
+}
+function dcDealVerdict(x,best,meta){
+  const price=x.listing||x.price||0,value=x.value||0,gap=price-value,gapPct=value?gap/value:0; let verdict='REVIEW',reason='Verify source values and comps before deciding.',action='Pull close comps and verify assumptions.';
+  if(gapPct>.30){verdict='OVERPRICED / WAIT';reason=`Price is ${pct(gapPct)} above supported underwriting value. The issue is price, not necessarily property quality.`;action=`Do not chase retail price. Monitor pending status or target ${money(meta.negotiation?.reasonable||value*1.02)} if it comes back to market.`;}
+  else if(gapPct>.10){verdict='NEGOTIATE';reason='Price is above supported value, but may be supportable if premium comps and renovation quality confirm it.';action=`Use ${money(meta.negotiation?.reasonable||value)}–${money(meta.negotiation?.stretch||value*1.1)} as the review band.`;}
+  else if(best.score>=70){verdict='PURSUE';reason='Price/value relationship and strategy score justify deeper diligence.';action='Verify comps, condition, title, insurance, and financing.';}
+  return {verdict,reason,action,priceGap:gap,gapPct};
+}
+function analyzeDealV6(manual=false){
+  const box=document.getElementById('analysisResult'); if(!box)return;
+  const x=getInputs(); const selected=x.analysisType; const meta=getDetectedMeta();
+  const scores=[scoreRetail(x),scoreHomeowner(x),scoreRental(x),scoreFlip(x),scoreWholesale(x),scoreLand(x)];
+  const best=recommendationFromScores(scores, selected==='land'?'land':selected);
+  const sorted=scores.slice().sort((a,b)=>b.score-a.score);
+  const label=labelAnalysis(best.type); const verdict=dcDealVerdict(x,best,meta); const breakdown=dcScoreBreakdown(x,best,meta);
+  const scoreBars=Object.entries(breakdown).map(([k,v])=>`<div class="score-line"><span>${escapeHtml(k)}</span><strong>${v}</strong><div><i style="width:${v}%"></i></div></div>`).join('');
+  const metrics=best.metrics.map(([k,v])=>`<div class="metric"><span class="muted">${k}</span><strong>${v}</strong></div>`).join('');
+  const investorSections=buildInvestorSections(x,best,scores);
+  const intelligence=dcIntelligenceSections(x,best,scores);
+  const strategyCards=dcStrategyCards(sorted,x,meta,best);
+  const bullets=insightBullets(x,best,scores).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
+  const steps=nextSteps(x,best).map(s=>`<li>${escapeHtml(s)}</li>`).join('');
+  const band=dcV24ValueBand(meta); const valueRange=band.supported?`Conservative ${money(band.conservative)} · Supported ${money(band.supported)} · Upper ${money(band.upper)}`:'Verify comps';
+  box.innerHTML=`<div class="report-header v24-report"><div><p class="eyebrow">DealCalc Underwriting Report</p><h2>${escapeHtml(x.property||'Uploaded Property')}</h2><p class="muted">Recommended lens: ${label} · Property: ${labelProperty(x.propertyType)}</p></div><div class="score-badge"><strong>${best.score}</strong><span>/100</span></div></div><div class="deal-verdict-card ${verdict.verdict.startsWith('PURSUE')?'good':verdict.verdict.startsWith('REVIEW')||verdict.verdict.startsWith('NEGOTIATE')||verdict.verdict.startsWith('OVERPRICED')?'watch':'bad'}"><p class="eyebrow">Deal Verdict</p><h2>${escapeHtml(verdict.verdict)}</h2><p><strong>Reason:</strong> ${escapeHtml(verdict.reason)}</p><p><strong>Action:</strong> ${escapeHtml(verdict.action)}</p><p><strong>Value band:</strong> ${escapeHtml(valueRange)}</p></div><h3>DealCalc Score Breakdown</h3><div class="score-breakdown">${scoreBars}</div><div class="metric-grid">${metrics}</div>${intelligence}${investorSections}<h3>Best Use Ranking</h3><div class="strategy-grid strategy-grid-explained">${strategyCards}</div><h3>Investor alpha</h3><ul class="small-list alpha-list">${bullets}</ul><h3>Verify next</h3><ol class="small-list">${steps}</ol><details class="notes-details"><summary>Why this result was generated</summary><p class="muted">DealCalc validates extracted fields, builds a transparent value stack, then interprets seller motivation, comp reliability, renovation premium, equity reality, market position, and strategy fit. This is a screening report, not a substitute for appraisal, inspection, title, lender, legal, or zoning review.</p></details><p class="muted tiny-note">Educational estimate only. Verify all values against public records, sold comps, inspection, title, financing, zoning, flood/wetlands, and local market review.</p><p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Export / Print Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
+  trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:best.risk||baseRisk(best.score),manual:manual,value_source:meta.valueSource||''});
+}
