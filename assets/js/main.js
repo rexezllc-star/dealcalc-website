@@ -618,3 +618,223 @@ function insightBullets(x,best,scores){
   if(x.rent && (x.listing||x.price)){const rtp=safeDiv(x.rent*12,(x.listing||x.price)); bullets.push(`Gross rent yield is ${pct(rtp)} before expenses, vacancy, financing, repairs, and management.`)}
   if(best.score<60) bullets.push('Current numbers suggest repricing or passing before spending time on deeper underwriting.'); return bullets.slice(0,7);
 }
+
+
+/* =========================
+   DEALCALC V20 ACCURACY & UNDERWRITING FOUNDATION
+   Overrides V19 analyzer logic with confidence-scored extraction, value stack,
+   condition fix, deal verdict, strategy ranking, and audit mode.
+========================= */
+function dcCleanText(text){return String(text||'').replace(/\uFFFE|\uFFFD|\uFFFC/g,' ').replace(/[ \t]+/g,' ').replace(/\s*\n\s*/g,'\n').trim();}
+function dcTextFlat(text){return dcCleanText(text).replace(/\s+/g,' ');}
+function dcMoneyRE(){return '\\$?\\s*([0-9][0-9,]*(?:\\.\\d+)?)([kKmM])?';}
+function dcNum(n,s){return moneyToNumber(n,s)}
+function dcFieldAudit(label,value,confidence,source,reason){return {label,value:value||'',confidence:confidence||0,source:source||'',reason:reason||''};}
+function dcExtractField(raw,label,opts={}){
+  const flat=dcTextFlat(raw); const rx=opts.rx || new RegExp(label+'\\s*:?\\s*'+dcMoneyRE(),'i'); const m=flat.match(rx);
+  if(!m)return dcFieldAudit(label,0,0,'','Not found');
+  const val=dcNum(m[1],m[2]);
+  const ok=(!opts.min||val>=opts.min)&&(!opts.max||val<=opts.max);
+  return dcFieldAudit(label, ok?val:0, ok?(opts.confidence||96):30, opts.source||label, ok?'Exact labeled field':'Out-of-range or ambiguous');
+}
+function dcExtractTextField(raw,label,choices,source){
+  const flat=dcTextFlat(raw); const block=flat.match(new RegExp(label+'\\s*:?\\s*('+choices.join('|')+')','i'));
+  return dcFieldAudit(label,block?block[1].replace(/cancelled/i,'Canceled'):'Unknown',block?98:40,source||label,block?'Exact labeled status':'Not found');
+}
+function dcParseStatusV20(raw){
+  const flat=dcTextFlat(raw);
+  const cur=flat.match(/Current Listing Status[\s\S]{0,220}?Status\s*:?\s*(Pending|Active|On Market|Off Market|Removed|Canceled|Cancelled|Expired|Withdrawn)/i);
+  if(cur)return dcFieldAudit('Listing Status',cur[1].replace(/Cancelled/i,'Canceled'),99,'Current Listing Status section','Priority extraction from listing-status block');
+  const top=flat.match(/\bStatus\s*:?\s*(On Market|Off Market|Pending|Active|Removed|Canceled|Cancelled|Expired|Withdrawn)/i);
+  return dcFieldAudit('Listing Status',top?top[1].replace(/Cancelled/i,'Canceled'):'Unknown',top?88:35,top?'Property header status':'','Fallback property-level status');
+}
+function dcExtractCurrentListingPrice(raw){
+  const flat=dcTextFlat(raw);
+  const m=flat.match(/Current Listing Status[\s\S]{0,220}?Price\s*:?\s*\$?\s*([0-9][0-9,]*)([kKmM])?/i);
+  if(m)return dcFieldAudit('Current List Price',dcNum(m[1],m[2]),99,'Current Listing Status section','Current listing price field');
+  const h=dcExtractField(raw,'Listing Price',{min:1000,max:10000000,source:'Listing Price',confidence:80});
+  if(h.value)return h;
+  return dcExtractField(raw,'List Price',{min:1000,max:10000000,source:'List Price',confidence:78});
+}
+function dcExtractPropertyRent(raw){
+  const flat=dcTextFlat(raw);
+  const m=flat.match(/Opportunity[\s\S]{0,360}?Monthly\s+Rent\s*:?\s*\$?\s*([0-9][0-9,]*)([kKmM])?/i) || flat.match(/Monthly\s+Rent\s*:?\s*\$?\s*([0-9][0-9,]*)([kKmM])?/i);
+  if(!m)return dcFieldAudit('Monthly Rent',0,0,'','Not found');
+  const v=dcNum(m[1],m[2]);
+  if(v>=300 && v<=20000)return dcFieldAudit('Monthly Rent',v,100,'Opportunity → Monthly Rent','Property-level rent field; market chart numbers ignored');
+  return dcFieldAudit('Monthly Rent',0,20,'Monthly Rent','Discarded because value is outside normal property-rent range');
+}
+function dcExtractDistressed(raw){
+  const flat=dcTextFlat(raw); const m=flat.match(/Distressed\s*:?\s*(Yes|No)/i);
+  return dcFieldAudit('Distressed',m?m[1]:'Unknown',m?99:40,'Property header','Exact distressed field when present');
+}
+function dcExtractOwner(raw){
+  const flat=dcTextFlat(raw); const m=flat.match(/Owner Name\s*:?\s*([^\n]+?)(?=\s+Mailing Address|\s+Estimated Value|$)/i);
+  const owner=m?m[1].trim().replace(/\s+/g,' '):'';
+  return dcFieldAudit('Owner',owner,owner?96:0,'Owner Name','Owner from header');
+}
+function dcExtractOccupancy(raw){
+  const flat=dcTextFlat(raw); const m=flat.match(/Occupancy\s*:?\s*(Owner Occupied|Non-Owner Occupied|Vacant|Tenant Occupied)/i);
+  return dcFieldAudit('Occupancy',m?m[1]:'Unknown',m?96:35,'Property header','Occupancy field');
+}
+function dcExtractOwnership(raw){
+  const flat=dcTextFlat(raw); const m=flat.match(/Ownership\s*:?\s*(Corporate|Individual|Trust|LLC|Company)/i);
+  return dcFieldAudit('Ownership',m?m[1]:'Unknown',m?95:35,'Property header','Ownership field');
+}
+function dcConditionV20(raw){
+  const t=dcTextFlat(raw).toLowerCase(); const distressed=dcExtractDistressed(raw);
+  let condition='Unknown', repair=30000, conf=40, source='No clear condition signal', notes=[];
+  const hasUpdated=/beautifully updated|move[- ]?in ready|granite countertops|modern updates|updated kitchen|hardwood floors|renovated|remodeled|new roof|clean finishes/i.test(t);
+  const hasHeavy=/fire damage|mold|tear.?down|needs (?:full|complete|major)|gut rehab|major rehab|structural|uninhabitable/i.test(t);
+  const hasLight=/tlc|needs work|needs repairs|fixer|handyman|investor special/i.test(t);
+  if(String(distressed.value).toLowerCase()==='no' && hasUpdated){condition='Updated / Retail-Ready'; repair=12000; conf=94; source='Distressed: No + updated listing description/photos'; notes.push('Document says Distressed: No and listing language indicates updated, move-in-ready condition.');}
+  else if(String(distressed.value).toLowerCase()==='no' && !hasLight && !hasHeavy){condition='Average / Not Distressed'; repair=25000; conf=82; source='Distressed: No'; notes.push('No major repair language was detected; verify with inspection.');}
+  else if(hasHeavy || String(distressed.value).toLowerCase()==='yes'){condition='Heavy Rehab / Distressed'; repair=75000; conf=90; source='Distress or heavy-rehab text'; notes.push('Heavy repair or distress terms were detected.');}
+  else if(hasLight){condition='Value-add / Repairs Needed'; repair=45000; conf=78; source='Repair keywords'; notes.push('Repair/value-add language was detected.');}
+  else if(hasUpdated){condition='Updated / Retail-Ready'; repair=15000; conf=86; source='Updated listing description'; notes.push('Listing description suggests updated condition.');}
+  return {condition,repairEstimate:repair,confidence:conf,source,notes,distressed:distressed.value};
+}
+function dcListingHistoryV20(raw){
+  const sec=sectionBetween(raw,'Listing History','Comparables & Nearby Listings|Page 3|Property Images');
+  const prices=moneyList(sec).filter(n=>n>=50000&&n<=2000000);
+  const rents=moneyList(sec).filter(n=>n>=700&&n<10000);
+  const actions=(sec.match(/\b(Canceled|Cancelled|Expired|Withdrawn|Active|Pending|Sold|Fail|Contingent)\b/ig)||[]).map(s=>s.replace(/Cancelled/i,'Canceled'));
+  return {listHistoryHigh:prices.length?Math.max(...prices):0,listHistoryLow:prices.length?Math.min(...prices):0,listHistoryCount:prices.length,priorRentListings:rents.slice(0,8),actions,hasCanceled:actions.some(a=>/Canceled|Expired|Withdrawn|Fail/i.test(a))};
+}
+function dcMedian(arr){const a=arr.filter(n=>Number.isFinite(n)&&n>0).sort((x,y)=>x-y); if(!a.length)return 0; const mid=Math.floor(a.length/2); return a.length%2?a[mid]:(a[mid-1]+a[mid])/2;}
+function dcExtractCompRows(raw){
+  const sec=sectionBetween(raw,'COMPARABLES','NEARBY LISTINGS');
+  const lines=sec.split(/(?=\b[A-Z]\s+0\.\d+\s+)/g).map(s=>s.trim()).filter(Boolean);
+  const rows=[];
+  for(const line of lines){
+    const m=line.match(/^([A-Z])\s+([0-9.]+)\s+(.+?)\s+(\d{1,2}\/\d{1,2}\/\d{2})\s+\$?([0-9,]+)\s+([0-9,]+)?\s*\$?([0-9,]+)?\s*(\d+(?:\.\d+)?)?\s*(\d+(?:\.\d+)?)?/i);
+    if(m){const price=+m[5].replace(/,/g,''); const sqft=m[6]?+m[6].replace(/,/g,''):0; const ppsf=m[7]?+m[7].replace(/,/g,''):0; if(price>0) rows.push({id:m[1],dist:+m[2],price,sqft,ppsf,beds:+(m[8]||0),baths:+(m[9]||0),raw:line});}
+  }
+  return rows;
+}
+function dcExtractNearbyListings(raw){
+  const sec=sectionBetween(raw,'NEARBY LISTINGS','Property Images|Statistics for|Page 5');
+  const prices=moneyList(sec).filter(n=>n>=50000&&n<=3000000);
+  const rents=moneyList(sec).filter(n=>n>=700&&n<10000);
+  return {prices,rents,medianPrice:dcMedian(prices),medianRent:dcMedian(rents),count:prices.length};
+}
+function dcValueStackV20(data){
+  const candidates=[];
+  const add=(name,value,weight,source,confidence)=>{if(value&&Number.isFinite(value)&&value>1000)candidates.push({name,value:Math.round(value),weight,source,confidence});};
+  const comps=data.compRows||[]; const validComps=comps.filter(c=>c.price>50000&&c.price<2000000&&c.dist<=0.75);
+  const ppsfComps=validComps.filter(c=>c.ppsf>=80&&c.ppsf<=600&&(!data.sqft || (c.sqft>=data.sqft*.65 && c.sqft<=data.sqft*1.45)));
+  const medianPpsf=dcMedian(ppsfComps.map(c=>c.ppsf));
+  const ppsfValue=(medianPpsf&&data.sqft)?medianPpsf*data.sqft:0;
+  const medianSold=dcMedian(validComps.map(c=>c.price));
+  add('CMA Estimated Value',data.estimatedValue,0.23,'Estimated Value field',95);
+  add('Average Sale Price',data.avgSalePrice,0.20,'CMA comparables summary',92);
+  add('Taxable Value',data.taxableValue,0.12,'Tax Status',84);
+  add('Sold Comp Median',medianSold,0.22,`${validComps.length} nearby sold comps`,78);
+  add('Price/SqFt Model',ppsfValue,0.18,`${ppsfComps.length} size-filtered sold comps`,80);
+  add('Current Pending/List Price',data.listingPrice,0.05,'Current listing status',70);
+  const usable=candidates.filter(c=>c.name!=='Current Pending/List Price' || data.status==='Pending');
+  const total=usable.reduce((s,c)=>s+c.weight,0)||1;
+  const weighted=usable.reduce((s,c)=>s+c.value*c.weight,0)/total;
+  const baseVals=usable.filter(c=>c.name!=='Current Pending/List Price').map(c=>c.value);
+  let low=dcMedian(baseVals.length?baseVals:usable.map(c=>c.value));
+  let high=Math.max(...(baseVals.length?baseVals:usable.map(c=>c.value)), weighted||0);
+  if(low&&high&&Math.abs(high-low)<25000){high=Math.round(high*1.12); low=Math.round(low*.96)}
+  return {candidates,weighted:Math.round(weighted||0),low:Math.round(low||0),high:Math.round(high||0),medianSold,medianPpsf,ppsfValue:Math.round(ppsfValue||0),validCompCount:validComps.length,ppsfCompCount:ppsfComps.length};
+}
+function dcMarketStatsV20(raw){
+  const stats=parseMarketStats(raw)||{};
+  const flat=dcTextFlat(raw);
+  const m30=flat.match(/Last 30 Days[\s\S]{0,300}?Homes Sold\s+Average Sale Price\s+0\s*%\s*([0-9,]+)\s+([+-]?\d+(?:\.\d+)?)\s*%\s*\$\s*([0-9,]+)/i);
+  if(m30){stats.last30HomesSold=+m30[1].replace(/,/g,''); stats.last30AvgSaleChange=+m30[2]; stats.last30AvgSalePrice=+m30[3].replace(/,/g,'');}
+  const m6=flat.match(/Last 6 Months[\s\S]{0,700}?Homes Sold\s+Average Sale Price\s+0\s*%\s*([0-9,]+)\s+([+-]?\d+(?:\.\d+)?)\s*%\s*\$\s*([0-9,]+)/i);
+  if(m6){stats.last6HomesSold=+m6[1].replace(/,/g,''); stats.last6AvgSaleChange=+m6[2]; stats.last6AvgSalePrice=+m6[3].replace(/,/g,'');}
+  return stats;
+}
+function detectFromText(rawInput){
+  const raw=dcCleanText(rawInput); const flat=dcTextFlat(raw); const data={raw};
+  data.address=parseAddress(raw);
+  const owner=dcExtractOwner(raw), occupancy=dcExtractOccupancy(raw), ownership=dcExtractOwnership(raw), status=dcParseStatusV20(raw), rent=dcExtractPropertyRent(raw), list=dcExtractCurrentListingPrice(raw), distressed=dcExtractDistressed(raw);
+  data.owner=owner.value; data.occupancy=occupancy.value; data.ownership=ownership.value; data.status=status.value; data.monthlyRent=rent.value; data.listingPrice=list.value;
+  data.estimatedValue=dcExtractField(raw,'Estimated Value',{min:1000,max:10000000,source:'CMA header',confidence:97}).value;
+  data.avgSalePrice=parseMoneyAfter(flat,['Avg\\.? Sale Price','Average Sale Price']);
+  data.mortgageBalance=dcExtractField(raw,'Mortgage Balance',{min:0,max:10000000,source:'Opportunity section',confidence:98}).value;
+  data.estimatedEquity=dcExtractField(raw,'Estimated Equity',{min:0,max:10000000,source:'Opportunity section / open liens',confidence:98}).value;
+  data.propertyTax=parseSectionMoney(raw,'Tax Status','Property Tax',600) || parseMoneyAfter(flat,['Property Tax','Annual Tax','Taxes']);
+  data.taxableValue=parseSectionMoney(raw,'Tax Status','Total Taxable Value',600) || 0;
+  data.hoaAnnual=dcExtractField(raw,'Home Owner Assessments Fee',{min:0,max:50000,source:'Association Information',confidence:94}).value || parseHoaAnnual(raw);
+  data.beds=parseNumberAfter(flat,['Bedrooms','Beds']); data.baths=parseNumberAfter(flat,['Bathrooms','Baths']); data.sqft=parseNumberAfter(flat,['Square Feet','Living Area','Sq\\.?Ft\\.?']); data.lotSize=parseNumberAfter(flat,['Lot Size']); data.yearBuilt=parseNumberAfter(flat,['Year Built']); data.daysOnMarket=parseNumberAfter(flat,['Days on Market','Average DOM','DOM']);
+  data.propertyType='unknown';
+  if(/Property Type\s*:?\s*Land|Residential-Vacant Land|Vacant Land|Land Use\s*:?\s*Residential-Vacant Land/i.test(flat)) data.propertyType='land';
+  if(/Property Type\s*:?\s*Single Family|Single Family \(SFR\)|Land Use\s*:?\s*Single Family Residential|Bedrooms\s*:?\s*\d/i.test(flat)) data.propertyType='sfr';
+  if(/Multifamily|Duplex|Triplex|Fourplex/i.test(flat)) data.propertyType='multi'; if(/Condo|Townhome|Townhouse/i.test(flat)) data.propertyType='condo';
+  data.condition=dcConditionV20(raw); data.listingHistory=dcListingHistoryV20(raw); data.marketStats=dcMarketStatsV20(raw); data.compRows=dcExtractCompRows(raw); data.nearbyListings=dcExtractNearbyListings(raw); data.distressed=distressed.value;
+  if(data.propertyType==='land'){
+    data.market=parseLandMarket(raw); data.underwritingValue=data.market.landCompMedian||data.market.landListingMedian||data.avgSalePrice||data.estimatedValue; data.valueStack={candidates:[{name:'Land Sold Median',value:data.market.landCompMedian||0,weight:.55,source:'Land-only sold comps',confidence:80},{name:'Land Listing Median',value:data.market.landListingMedian||0,weight:.25,source:'Land active listings',confidence:70},{name:'CMA Estimate',value:data.estimatedValue||0,weight:.2,source:'CMA header',confidence:80}].filter(c=>c.value),weighted:Math.round(data.underwritingValue||0),low:Math.round(Math.min(...[data.market.landCompMedian,data.market.landListingMedian,data.avgSalePrice,data.estimatedValue].filter(Boolean))||0),high:Math.round(Math.max(...[data.market.landCompMedian,data.market.landListingMedian,data.avgSalePrice,data.estimatedValue].filter(Boolean))||0)}; data.valueSource='land-only comparable stack'; data.suggestedAnalysis='land';
+  } else {
+    data.valueStack=dcValueStackV20(data); data.underwritingValue=data.valueStack.weighted||data.valueStack.medianSold||data.avgSalePrice||data.estimatedValue; data.valueSource='confidence-weighted value stack'; data.suggestedAnalysis='retail'; if(data.monthlyRent && data.listingPrice && (data.monthlyRent*12/data.listingPrice)>=.07) data.suggestedAnalysis='rental'; if((data.mortgageBalance||data.estimatedEquity) && !data.listingPrice) data.suggestedAnalysis='homeowner'; if(data.listingPrice && data.underwritingValue && data.listingPrice>data.underwritingValue*1.08) data.suggestedAnalysis='retail';
+  }
+  data.validation={owner,occupancy,ownership,status,rent,list,distressed,estimatedValue:dcFieldAudit('Estimated Value',data.estimatedValue,97,'CMA header','Exact labeled value'),avgSalePrice:dcFieldAudit('Average Sale Price',data.avgSalePrice,92,'Comparables summary','Exact labeled average sale price'),mortgageBalance:dcFieldAudit('Mortgage Balance',data.mortgageBalance,98,'Opportunity section','Exact labeled loan balance'),estimatedEquity:dcFieldAudit('Estimated Equity',data.estimatedEquity,98,'Opportunity section','Exact labeled equity'),condition:dcFieldAudit('Condition',data.condition.condition,data.condition.confidence,data.condition.source,(data.condition.notes||[])[0]||''),taxableValue:dcFieldAudit('Taxable Value',data.taxableValue,data.taxableValue?92:0,'Tax Status','Total taxable value')};
+  data.redFlags=[]; data.opportunities=[]; data.expectedInsights=[];
+  const gap=(data.listingPrice||0)-(data.underwritingValue||0);
+  if(gap>0)data.redFlags.push(`Asking price is ${money(gap)} above DealCalc's supported underwriting value.`); else if(gap<0)data.opportunities.push(`Asking price is ${money(Math.abs(gap))} below supported underwriting value.`);
+  if(data.status==='Pending')data.redFlags.push('Current listing status is pending; confirm availability before spending time on underwriting.');
+  if(data.monthlyRent&&data.listingPrice){const gy=data.monthlyRent*12/data.listingPrice; if(gy<.07)data.redFlags.push(`Gross rent yield is ${pct(gy)}, which may be weak before expenses and debt service.`); else data.opportunities.push(`Gross rent yield is ${pct(gy)} before expenses.`);}
+  if(data.estimatedEquity&&data.estimatedValue){const er=data.estimatedEquity/data.estimatedValue; if(er<.15)data.redFlags.push(`Reported seller equity is thin at ${pct(er)} of estimated value.`); else data.opportunities.push(`Reported seller equity is ${pct(er)} of estimated value.`);}
+  if(data.condition.condition.includes('Updated'))data.opportunities.push('Condition appears retail-ready; valuation may support some premium over average unrepaired comps, but not unlimited overpay.');
+  if(data.listingHistory.hasCanceled)data.opportunities.push('Listing history includes cancellation/expiration/failed status, which can indicate seller fatigue or pricing resistance.');
+  if(data.ownership==='Corporate'||/llc|properties|holdings|invest/i.test(data.owner||''))data.expectedInsights.push('Ownership appears investor/corporate; negotiation behavior may differ from an owner-occupant seller.');
+  data.expectedInsights.push('Verify whether the highest comps are truly comparable in size, condition, renovation level, and micro-location before accepting the list price.');
+  data.expectedInsights.push('Use the value stack as a screening range; final value still needs 3-5 hand-selected comps.');
+  data.confidence=Math.round(Math.min(99,Math.max(60,((data.validation.status.confidence||0)+(data.validation.rent.confidence||0)+(data.validation.list.confidence||0)+(data.validation.estimatedValue.confidence||0)+(data.validation.condition.confidence||0))/5)));
+  return data;
+}
+function dcSourceRows(meta){
+  const v=meta.validation||{}; const rows=[];
+  ['status','rent','list','estimatedValue','avgSalePrice','mortgageBalance','estimatedEquity','condition','owner','occupancy','ownership'].forEach(k=>{if(v[k]&&v[k].value){rows.push(`<tr><td>${escapeHtml(v[k].label)}</td><td>${escapeHtml(typeof v[k].value==='number'?money(v[k].value):v[k].value)}</td><td>${v[k].confidence}%</td><td>${escapeHtml(v[k].source)}</td></tr>`);}});
+  return rows.join('');
+}
+function dcDealVerdict(x,best,meta){
+  const gap=(x.listing||x.price||0)-(x.value||0); const gapPct=x.value?gap/x.value:0; let verdict='REVIEW', reason='Verify source values and comps before deciding.', action='Pull close comps and verify assumptions.';
+  if(best.score>=78 && gapPct<.05){verdict='PURSUE'; reason='Deal score and price/value relationship are favorable.'; action='Proceed to deeper diligence and offer strategy.';}
+  else if(gapPct>.20){verdict='PASS / WAIT'; reason=`Price is ${pct(gapPct)} above supported underwriting value.`; action=`Target repricing near ${money((x.value||0)*1.05)} or below.`;}
+  else if(best.score<50){verdict='REPRICE'; reason='Current assumptions do not support a strong investor outcome.'; action='Negotiate price or change strategy.';}
+  else {verdict='REVIEW'; reason='Some signals are usable, but price, status, or value confidence needs verification.'; action='Verify top comps, status, and expense assumptions.';}
+  return {verdict,reason,action,priceGap:gap,gapPct};
+}
+function dcScoreBreakdown(x,best,meta){
+  const priceScore=clampScore(100-((Math.max(0,(x.listing||x.price||0)-(x.value||0))/(x.value||1))*180));
+  const conditionScore=meta.condition?.condition?.includes('Updated')?88:meta.condition?.condition?.includes('Heavy')?25:62;
+  const rentScore=x.rent&&x.listing?clampScore((x.rent*12/x.listing)*900):45;
+  const equityScore=meta.estimatedEquity&&meta.estimatedValue?clampScore((meta.estimatedEquity/meta.estimatedValue)*220):50;
+  const dataScore=valuationConfidence(meta,x);
+  return {Pricing:priceScore,Condition:conditionScore,Rentability:rentScore,Equity:equityScore,'Data Confidence':dataScore};
+}
+function applyDetectedData(data){
+  resetAnalyzerFieldsForNewUpload(); setText('propertyLabel',data.address,true); setVal('listingPrice',data.listingPrice,true); setVal('purchasePrice',data.listingPrice || data.underwritingValue || data.estimatedValue,true); setVal('analyzerArv',data.underwritingValue || data.estimatedValue || data.avgSalePrice,true); setVal('loanBalance',data.mortgageBalance,true); setVal('monthlyRent',data.monthlyRent,true); setVal('analyzerRepairs',data.condition?.repairEstimate,true); const taxMonthly=data.propertyTax?data.propertyTax/12:0; const hoaMonthly=data.hoaAnnual?data.hoaAnnual/12:0; if(data.monthlyRent)setVal('monthlyExpenses',Math.round(data.monthlyRent*.35+taxMonthly+hoaMonthly+150),true);
+  const p=document.getElementById('propertyType'); if(p&&data.propertyType)p.value=data.propertyType; const a=document.getElementById('analysisType'); if(a&&data.suggestedAnalysis)a.value=data.suggestedAnalysis;
+  const notes=document.getElementById('documentNotes'); if(notes) notes.dataset.detected=JSON.stringify({valueSource:data.valueSource,market:data.market,marketStats:data.marketStats,valueStack:data.valueStack,redFlags:data.redFlags,opportunities:data.opportunities,expectedInsights:data.expectedInsights,status:data.status,currentListing:{status:data.status,price:data.listingPrice},listingHistory:data.listingHistory,condition:data.condition,estimatedValue:data.estimatedValue,avgSalePrice:data.avgSalePrice,underwritingValue:data.underwritingValue,listingPrice:data.listingPrice,estimatedEquity:data.estimatedEquity,mortgageBalance:data.mortgageBalance,monthlyRent:data.monthlyRent,propertyTax:data.propertyTax,hoaAnnual:data.hoaAnnual,confidence:data.confidence,beds:data.beds,baths:data.baths,sqft:data.sqft,yearBuilt:data.yearBuilt,owner:data.owner,ownership:data.ownership,occupancy:data.occupancy,validation:data.validation,taxableValue:data.taxableValue,nearbyListings:data.nearbyListings});
+  updateAnalyzerMode(); const summary=document.getElementById('extractionSummary'); if(summary){summary.classList.remove('hidden-field'); const vs=data.valueStack||{}; summary.innerHTML=`<div class="extract-top"><strong>Detected:</strong> ${escapeHtml(labelProperty(data.propertyType))} · ${escapeHtml(labelAnalysis(data.suggestedAnalysis))} <span class="pill">${data.confidence}% confidence</span></div><div class="extract-grid">${data.address?`<span>Address <strong>${escapeHtml(data.address)}</strong></span>`:''}<span>DealCalc Value <strong>${money(data.underwritingValue)}</strong><small>${escapeHtml(data.valueSource||'validated value stack')}</small></span>${vs.low&&vs.high?`<span>Underwriting Range <strong>${money(vs.low)}–${money(vs.high)}</strong><small>screening range</small></span>`:''}${data.listingPrice?`<span>List/Asking Price <strong>${money(data.listingPrice)}</strong><small>${data.validation?.list?.confidence||''}% confidence</small></span>`:''}${data.monthlyRent?`<span>Property Rent <strong>${money(data.monthlyRent)}/mo</strong><small>${data.validation?.rent?.confidence||''}% confidence</small></span>`:''}${data.status?`<span>Listing Status <strong>${escapeHtml(data.status)}</strong><small>${data.validation?.status?.confidence||''}% confidence</small></span>`:''}${data.condition?`<span>Condition <strong>${escapeHtml(data.condition.condition)}</strong><small>${data.condition.confidence}% confidence</small></span>`:''}</div>`;}
+}
+function marketRead(meta,x){
+  const vs=meta.valueStack||{}, ms=meta.marketStats||{}, rows=[];
+  if(vs.low&&vs.high)rows.push(['Underwriting range',`${money(vs.low)} – ${money(vs.high)}`,'Screening range from validated value signals']);
+  if(vs.candidates?.length)rows.push(['Value stack',money(vs.weighted),vs.candidates.map(c=>`${c.name}: ${money(c.value)}`).join(' · ')]);
+  if(meta.listingPrice&&meta.underwritingValue){const gap=meta.listingPrice-meta.underwritingValue;rows.push(['Price gap',gap>=0?`${money(gap)} over value`:`${money(Math.abs(gap))} under value`,gap>=0?'Needs repricing or premium justification':'Potential spread signal']);}
+  if(x.rent&&(x.listing||x.price))rows.push(['Gross rent yield',pct(x.rent*12/(x.listing||x.price)),'Before vacancy, capex, management, financing']);
+  if(meta.status)rows.push(['Listing status',meta.status,meta.status==='Pending'?'Availability may be limited; verify before offering':'Confirm current availability']);
+  if(meta.condition?.condition)rows.push(['Condition',meta.condition.condition,meta.condition.source||'Condition signal']);
+  if(meta.owner)rows.push(['Owner profile',`${meta.owner}`,`${meta.ownership||''}${meta.occupancy?` · ${meta.occupancy}`:''}`]);
+  if(ms.last30AvgSalePrice||ms.last6AvgSalePrice)rows.push(['Market timing',`${ms.last30AvgSalePrice?money(ms.last30AvgSalePrice):'N/A'} 30-day avg sale`,`${ms.last6AvgSalePrice?money(ms.last6AvgSalePrice):'N/A'} six-month avg sale`]);
+  return rows;
+}
+function buildInvestorSections(x,best,scores){
+  const meta=getDetectedMeta(); const mr=marketRead(meta,x).slice(0,9).map(([k,v,s])=>metricLine(k,v,s)).join(''); const red=(meta.redFlags||[]).concat(best.score<55?['Current assumptions require repricing or strategy change before pursuing.']:[]).slice(0,6); const opp=(meta.opportunities||[]).slice(0,5); const exp=(meta.expectedInsights||[]).slice(0,4); const audit=dcSourceRows(meta);
+  return `${buildDataQuality(meta,x)}${mr?`<h3>Underwriting intelligence</h3><div class="metric-grid market-read">${mr}</div>`:''}${red.length?`<h3>Risk flags</h3><ul class="small-list risk-list">${red.map(r=>`<li>${escapeHtml(r)}</li>`).join('')}</ul>`:''}${opp.length?`<h3>Potential upside</h3><ul class="small-list opportunity-list">${opp.map(o=>`<li>${escapeHtml(o)}</li>`).join('')}</ul>`:''}${exp.length?`<h3>What a smart investor should notice</h3><ul class="small-list">${exp.map(o=>`<li>${escapeHtml(o)}</li>`).join('')}</ul>`:''}${audit?`<details class="notes-details extraction-audit"><summary>Extraction audit / source confidence</summary><table class="audit-table"><thead><tr><th>Field</th><th>Value</th><th>Confidence</th><th>Source</th></tr></thead><tbody>${audit}</tbody></table></details>`:''}`;
+}
+function insightBullets(x,best,scores){
+  const meta=getDetectedMeta(); const bullets=[]; if(meta.valueStack?.candidates?.length)bullets.push(`Value stack uses ${meta.valueStack.candidates.map(c=>c.name).join(', ')} instead of trusting one headline number.`); if(meta.status)bullets.push(`Listing status was extracted as ${meta.status}; timing and availability matter before pursuing.`); if(meta.condition?.condition)bullets.push(`Condition read: ${meta.condition.condition}; repair assumptions should match this, not default to distressed rehab.`); (meta.redFlags||[]).slice(0,3).forEach(f=>bullets.push(f)); (meta.opportunities||[]).slice(0,2).forEach(o=>bullets.push(o)); if(x.rent&&(x.listing||x.price))bullets.push(`Gross rent yield is ${pct(x.rent*12/(x.listing||x.price))} before expenses and debt service.`); return bullets.slice(0,7);
+}
+function analyzeDealV6(manual=false){
+  const box=document.getElementById('analysisResult'); if(!box)return; const x=getInputs(); const selected=x.analysisType; const meta=getDetectedMeta(); const scores=[scoreRetail(x),scoreHomeowner(x),scoreRental(x),scoreFlip(x),scoreWholesale(x),scoreLand(x)]; const best=recommendationFromScores(scores, selected==='land'?'land':selected); const sorted=scores.slice().sort((a,b)=>b.score-a.score); const label=labelAnalysis(best.type); const verdict=dcDealVerdict(x,best,meta); const breakdown=dcScoreBreakdown(x,best,meta); const scoreBars=Object.entries(breakdown).map(([k,v])=>`<div class="score-line"><span>${escapeHtml(k)}</span><strong>${v}</strong><div><i style="width:${v}%"></i></div></div>`).join(''); const metrics=best.metrics.map(([k,v])=>`<div class="metric"><span class="muted">${k}</span><strong>${v}</strong></div>`).join(''); const compCards=sorted.slice(0,6).map((s,i)=>`<div class="strategy-card ${s.type===best.type?'active':''}"><span>#${i+1} ${labelAnalysis(s.type)}</span><strong>${s.score}</strong><small>${s.risk||baseRisk(s.score)} risk</small></div>`).join(''); const bullets=insightBullets(x,best,scores).map(b=>`<li>${escapeHtml(b)}</li>`).join(''); const steps=nextSteps(x,best).map(s=>`<li>${escapeHtml(s)}</li>`).join(''); const investorSections=buildInvestorSections(x,best,scores); const valueRange=meta.valueStack?.low&&meta.valueStack?.high?`${money(meta.valueStack.low)} – ${money(meta.valueStack.high)}`:'Verify comps';
+  box.innerHTML=`<div class="report-header v20-report"><div><p class="eyebrow">DealCalc Underwriting Report</p><h2>${escapeHtml(x.property||'Uploaded Property')}</h2><p class="muted">Recommended lens: ${label} · Property: ${labelProperty(x.propertyType)}</p></div><div class="score-badge"><strong>${best.score}</strong><span>/100</span></div></div><div class="deal-verdict-card ${verdict.verdict.startsWith('PURSUE')?'good':verdict.verdict.startsWith('REVIEW')?'watch':'bad'}"><p class="eyebrow">Deal Verdict</p><h2>${escapeHtml(verdict.verdict)}</h2><p><strong>Reason:</strong> ${escapeHtml(verdict.reason)}</p><p><strong>Action:</strong> ${escapeHtml(verdict.action)}</p><p><strong>Underwriting range:</strong> ${escapeHtml(valueRange)}</p></div><h3>DealCalc Score Breakdown</h3><div class="score-breakdown">${scoreBars}</div><div class="metric-grid">${metrics}</div>${investorSections}<h3>Best Strategy Ranking</h3><div class="strategy-grid">${compCards}</div><h3>Investor takeaways</h3><ul class="small-list">${bullets}</ul><h3>Next checks</h3><ol class="small-list">${steps}</ol><details class="notes-details"><summary>Why this result was generated</summary><p class="muted">DealCalc validates each extracted field, builds a transparent value stack, then scores strategies based on price/value gap, rental yield, condition, equity, and risk. This is a screening report, not a substitute for inspection, appraisal, title, zoning, or lender review.</p></details><p class="muted tiny-note">Educational estimate only. Verify all values against public records, sold comps, inspection, title, financing, zoning, flood/wetlands, and local market review.</p><p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Export / Print Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`; trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:best.risk||baseRisk(best.score),manual:manual,value_source:meta.valueSource||''});
+}

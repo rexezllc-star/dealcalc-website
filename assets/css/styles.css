@@ -65,3 +65,10 @@
 /* V17 research-based analyzer/report polish */
 .data-quality{border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:16px 0;display:grid;gap:2px;background:#0b111d}.data-quality strong{font-size:18px}.data-quality span{color:#fff;font-weight:800}.data-quality small{color:var(--muted)}.data-quality.good{border-color:rgba(80,216,144,.4);background:rgba(80,216,144,.07)}.data-quality.watch{border-color:rgba(216,173,85,.42);background:rgba(216,173,85,.07)}.data-quality.bad{border-color:rgba(255,107,107,.42);background:rgba(255,107,107,.07)}.market-read .metric small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.risk-list li::marker{color:var(--red)}.opportunity-list li::marker{color:var(--green)}.analyzer-report h3{margin-top:22px;margin-bottom:8px}.metric-grid.market-read{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric-grid.market-read .metric{background:#0b111d;border:1px solid var(--line);border-radius:14px;padding:12px}
 @media(max-width:760px){.metric-grid.market-read{grid-template-columns:1fr}}
+
+
+/* V20 underwriting report polish */
+.deal-verdict-card{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:18px;margin:18px 0;background:rgba(255,255,255,.04)}
+.deal-verdict-card h2{margin:.2rem 0 .5rem;font-size:2rem}.deal-verdict-card.good{border-color:rgba(71,208,124,.45);background:rgba(71,208,124,.08)}.deal-verdict-card.watch{border-color:rgba(245,184,72,.45);background:rgba(245,184,72,.08)}.deal-verdict-card.bad{border-color:rgba(244,99,99,.45);background:rgba(244,99,99,.08)}
+.score-breakdown{display:grid;gap:10px;margin:12px 0 18px}.score-line{display:grid;grid-template-columns:120px 42px 1fr;gap:10px;align-items:center}.score-line div{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}.score-line i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#f5b84a,#47d07c)}
+.audit-table{width:100%;border-collapse:collapse;font-size:.9rem}.audit-table th,.audit-table td{border-bottom:1px solid rgba(255,255,255,.1);padding:8px;text-align:left}.extraction-audit{margin-top:18px}.v20-report .eyebrow{letter-spacing:.08em}

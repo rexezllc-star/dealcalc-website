@@ -1,20 +1,27 @@
-# DealCalc Full Update V19
+# DealCalc Full Update V20
 
 Upload the full contents of this folder to the GitHub repository root and overwrite existing files.
 
-V19 focuses on AI Analyzer underwriting quality:
+V20 focuses on underwriting accuracy and trust:
 
-- Stronger CMA extraction logic
-- Property-level rent prioritization
-- Listing status and listing history signals
-- Condition/readiness extraction from listing text and photos section cues
-- Valuation range and weighted value stack
-- Source hierarchy: adjusted comp $/sqft, median sold comps, CMA avg sale price, CMA estimated value
-- Market trend extraction from CMA stats
-- Risk flags, upside, and “what a smart investor should notice” sections
-- Better default repair/expense assumptions based on detected condition, taxes, HOA, and rent
+- Extraction Engine 2.0 with confidence-scored fields
+- Correct property-level rent extraction
+- Correct current listing status extraction
+- Correct condition logic: Distressed: No + updated listing text = Updated / Retail-Ready
+- Transparent underwriting value stack
+- Deal Verdict card at top of report
+- DealCalc Score breakdown
+- Best Strategy Ranking
+- Extraction Audit / source-confidence table
+- Contact page email/dropdown improvements
+- Keeps V19 calculators, dashboard, auth, saved deals, and routing
 
-Important files:
+Critical files:
 - tools/ai-deal-analyzer.html
 - assets/js/main.js
 - assets/css/styles.css
+- contact.html
+- vercel.json
+
+Test case used for V20:
+- 4313 Polk St Houston CMA should extract Pending status, Monthly Rent $2,162, Distressed: No, Updated/Retail-Ready condition, and a value stack rather than a single blind value.
