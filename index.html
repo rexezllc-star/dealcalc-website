@@ -1,73 +1,175 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LVWBTX8RQB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LVWBTX8RQB');
+</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DealCalc.io — Real Estate Investment Calculators & Deal Analysis Tools</title>
-  <meta name="description" content="Free real estate investment calculators for wholesalers, land investors, landlords, property buyers, and rental investors. Calculate assignment fees, double close profits, ROI, seller finance payments, DSCR, cap rate, cash-on-cash return, mortgage payments, and MAO." />
-  <meta name="keywords" content="assignment fee calculator, double close calculator, land offer calculator, real estate wholesale calculator, DSCR calculator, cap rate calculator, cash on cash return calculator, seller finance calculator, mortgage calculator, MAO calculator" />
+  <title>DealCalc.io — Real Estate Deal Analysis Platform</title>
+  <meta name="description" content="Free real estate deal analysis calculators for wholesalers, land investors, landlords, property buyers, and rental investors." />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <link rel="canonical" href="https://dealcalc.io/" />
-  <meta property="og:title" content="DealCalc.io — Real Estate Investment Calculators" />
-  <meta property="og:description" content="Analyze wholesale deals, land investments, rental returns, financing scenarios, and more with free professional-grade calculators." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://dealcalc.io/" />
-  <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#0f172a" />
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"WebSite",
-    "name":"DealCalc.io",
-    "url":"https://dealcalc.io/",
-    "description":"Free real estate investment calculators and deal analysis tools.",
-    "potentialAction":{"@type":"SearchAction","target":"https://dealcalc.io/?q={search_term_string}","query-input":"required name=search_term_string"}
-  }
-  </script>
   <style>
-    :root{--bg:#f8fafc;--panel:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#2563eb;--brand2:#0f172a;--good:#16a34a;--warn:#ca8a04;--bad:#dc2626;--soft:#eff6ff;--shadow:0 20px 50px rgba(15,23,42,.08)}
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#fff 0%,var(--bg) 45%,#fff 100%);color:var(--ink)}
-    a{color:inherit;text-decoration:none}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-    .navin{height:72px;display:flex;align-items:center;justify-content:space-between}.logo{font-weight:900;letter-spacing:-.04em;font-size:1.35rem}.logo span{color:var(--brand)}.links{display:flex;gap:22px;font-size:.94rem;color:var(--muted);font-weight:650}.cta{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 18px;background:var(--brand);color:white;font-weight:800;box-shadow:0 10px 25px rgba(37,99,235,.22)}
-    .hero{padding:84px 0 56px}.hero-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:42px;align-items:center}.eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:white;border-radius:999px;padding:8px 12px;color:var(--muted);font-weight:750;font-size:.86rem}.dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
-    h1{font-size:clamp(2.7rem,6vw,5.35rem);line-height:.95;margin:20px 0 18px;letter-spacing:-.075em} .lead{font-size:1.22rem;line-height:1.7;color:var(--muted);max-width:680px}.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}.secondary{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:12px 18px;background:white;color:var(--ink);font-weight:800}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px}.stat{background:white;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}.stat b{display:block;font-size:1.4rem}.stat span{color:var(--muted);font-size:.86rem}
-    .hero-card{background:var(--panel);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:26px}.mini-title{font-weight:900;font-size:1.1rem}.mini-row{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);color:var(--muted)}.mini-row b{color:var(--ink)}.verdict{margin-top:18px;padding:16px;border-radius:18px;background:#ecfdf5;color:#166534;font-weight:850}.section{padding:58px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:22px;margin-bottom:22px}h2{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.055em;margin:0}.section p{color:var(--muted);line-height:1.7}.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}.tab{border:1px solid var(--line);background:white;border-radius:999px;padding:10px 14px;font-weight:800;color:var(--muted);cursor:pointer}.tab.active{background:var(--ink);color:white;border-color:var(--ink)}
-    .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.calc{display:none;background:white;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}.calc.active{display:block}.calc-head{padding:22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#f8fafc)}.calc-head h3{margin:0;font-size:1.45rem;letter-spacing:-.03em}.calc-body{padding:22px}.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}label{display:block;font-weight:800;font-size:.88rem;margin-bottom:7px}input,select{width:100%;border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:1rem;background:#fff;color:var(--ink)}.result{background:#0f172a;color:white;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:14px}.metric{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:12px}.metric:last-child{border-bottom:0;padding-bottom:0}.metric span{color:#cbd5e1}.metric b{font-size:1.2rem}.badge{display:inline-flex;align-self:flex-start;border-radius:999px;padding:8px 12px;font-weight:900;background:#dbeafe;color:#1d4ed8}.badge.good{background:#dcfce7;color:#166534}.badge.warn{background:#fef3c7;color:#92400e}.badge.bad{background:#fee2e2;color:#991b1b}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:white;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}.card h3{margin:0 0 8px;font-size:1.1rem}.pill{display:inline-flex;margin-bottom:14px;border-radius:999px;background:var(--soft);color:#1d4ed8;padding:7px 10px;font-size:.8rem;font-weight:850}.faq{display:grid;grid-template-columns:1fr 1fr;gap:18px}.faq div{background:white;border:1px solid var(--line);border-radius:20px;padding:20px}.disclaimer{background:#fffbeb;border:1px solid #fde68a;border-radius:22px;padding:20px;color:#78350f}.footer{padding:36px 0;border-top:1px solid var(--line);color:var(--muted)}.footerin{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.newsletter{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:white;border-radius:28px;padding:34px;display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center}.newsletter p{color:#cbd5e1}.subscribe{display:flex;gap:10px}.subscribe input{border:0}.subscribe button{border:0;border-radius:14px;background:#60a5fa;color:#0f172a;font-weight:900;padding:0 16px;cursor:pointer}.small{font-size:.88rem;color:var(--muted)}
-    @media(max-width:900px){.hero-grid,.calc-grid,.newsletter{grid-template-columns:1fr}.links{display:none}.cards,.faq{grid-template-columns:1fr}.form{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.section-head{display:block}}
-  </style>
+:root{
+  --bg:#020617;
+  --bg2:#0f172a;
+  --panel:#111827;
+  --panel2:#0b1220;
+  --ink:#f8fafc;
+  --muted:#94a3b8;
+  --line:rgba(148,163,184,.22);
+  --brand:#3b82f6;
+  --brand2:#60a5fa;
+  --good:#22c55e;
+  --warn:#f59e0b;
+  --bad:#ef4444;
+  --soft:rgba(59,130,246,.12);
+  --shadow:0 28px 80px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(59,130,246,.22), transparent 35%),
+    radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 30%),
+    linear-gradient(180deg,#020617 0%,#0f172a 55%,#020617 100%);
+  color:var(--ink);
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(2,6,23,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.navin{height:72px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:950;letter-spacing:-.04em;font-size:1.35rem}
+.logo span{color:var(--brand2)}
+.links{display:flex;gap:22px;font-size:.94rem;color:var(--muted);font-weight:700}
+.links a:hover{color:white}
+.cta{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 18px;background:linear-gradient(135deg,var(--brand),#2563eb);color:white;font-weight:900;box-shadow:0 15px 35px rgba(37,99,235,.28)}
+.secondary{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:12px 18px;background:rgba(255,255,255,.04);color:var(--ink);font-weight:850}
+.hero{padding:84px 0 56px}
+.hero-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:42px;align-items:center}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:8px 12px;color:var(--muted);font-weight:800;font-size:.86rem}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 24px var(--good)}
+h1{font-size:clamp(2.55rem,6vw,5.2rem);line-height:.95;margin:20px 0 18px;letter-spacing:-.075em}
+.lead{font-size:1.18rem;line-height:1.75;color:var(--muted);max-width:720px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px}
+.stat,.card,.faq div,.hero-card,.calc,.content-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.035));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+}
+.stat{padding:16px}
+.stat b{display:block;font-size:1.4rem}
+.stat span{color:var(--muted);font-size:.86rem}
+.hero-card{border-radius:28px;padding:26px}
+.mini-title{font-weight:950;font-size:1.1rem}
+.mini-row{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+.mini-row b{color:var(--ink)}
+.verdict{margin-top:18px;padding:16px;border-radius:18px;background:rgba(34,197,94,.12);color:#86efac;font-weight:900;border:1px solid rgba(34,197,94,.22)}
+.section{padding:58px 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:22px;margin-bottom:22px}
+h2{font-size:clamp(2rem,4vw,3.15rem);letter-spacing:-.055em;margin:0}
+h3{letter-spacing:-.025em}
+.section p,.content p,.content li{color:var(--muted);line-height:1.8}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0}
+.tab{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:10px 14px;font-weight:850;color:var(--muted);cursor:pointer}
+.tab.active{background:white;color:#0f172a;border-color:white}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.calc{display:none;overflow:hidden}
+.calc.active{display:block}
+.calc-head{padding:22px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.035)}
+.calc-head h3{margin:0;font-size:1.45rem}
+.calc-body{padding:22px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:850;font-size:.88rem;margin-bottom:7px}
+input,select,textarea{
+  width:100%;border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:1rem;background:rgba(255,255,255,.07);color:var(--ink)
+}
+input::placeholder, textarea::placeholder{color:#64748b}
+.result{background:#020617;color:white;border:1px solid var(--line);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.metric{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:12px}
+.metric:last-child{border-bottom:0;padding-bottom:0}
+.metric span{color:#cbd5e1}
+.metric b{font-size:1.15rem;text-align:right}
+.badge{display:inline-flex;align-self:flex-start;border-radius:999px;padding:8px 12px;font-weight:950;background:#dbeafe;color:#1d4ed8}
+.badge.good{background:#dcfce7;color:#166534}
+.badge.warn{background:#fef3c7;color:#92400e}
+.badge.bad{background:#fee2e2;color:#991b1b}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card,.content-card{padding:22px}
+.card h3{margin:0 0 8px;font-size:1.1rem}
+.pill{display:inline-flex;margin-bottom:14px;border-radius:999px;background:var(--soft);color:#bfdbfe;padding:7px 10px;font-size:.8rem;font-weight:900;border:1px solid rgba(59,130,246,.25)}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.disclaimer{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.32);border-radius:22px;padding:20px;color:#fde68a}
+.footer{padding:36px 0;border-top:1px solid var(--line);color:var(--muted)}
+.footerin{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.footer a{color:#cbd5e1;margin-right:12px}
+.newsletter{background:linear-gradient(135deg,#0b1220,#1e3a8a);color:white;border:1px solid var(--line);border-radius:28px;padding:34px;display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center;box-shadow:var(--shadow)}
+.newsletter p{color:#cbd5e1}
+.subscribe{display:flex;gap:10px}
+.subscribe button{border:0;border-radius:14px;background:#60a5fa;color:#0f172a;font-weight:950;padding:0 16px;cursor:pointer}
+.small{font-size:.88rem;color:var(--muted)}
+.content{max-width:860px;margin:0 auto;padding:58px 22px}
+.content h1{font-size:clamp(2.2rem,5vw,4rem)}
+.content h2{font-size:2rem;margin-top:38px}
+.content-card{margin:18px 0}
+.article-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:20px}
+.article-grid a{display:block}
+@media(max-width:900px){
+  .hero-grid,.calc-grid,.newsletter{grid-template-columns:1fr}
+  .links{display:none}
+  .cards,.faq,.article-grid{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .section-head{display:block}
+}
+</style>
 </head>
 <body>
-  <nav class="nav"><div class="wrap navin"><a href="#" class="logo">DealCalc<span>.io</span></a><div class="links"><a href="#calculators">Calculators</a><a href="#tools">Tools</a><a href="#learn">Learn</a><a href="#faq">FAQ</a></div><a href="#calculators" class="cta">Start Calculating</a></div></nav>
-  <main>
-    <section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow"><i class="dot"></i>Free real estate deal analysis tools</div><h1>Analyze deals. Calculate returns. Invest smarter.</h1><p class="lead">DealCalc.io gives wholesalers, land investors, landlords, and property buyers practical calculators for profit, ROI, financing, cash flow, and risk — no signup required.</p><div class="hero-actions"><a href="#calculators" class="cta">Browse Calculators</a><a href="#learn" class="secondary">Learn the Formulas</a></div><div class="stats"><div class="stat"><b>10</b><span>Live calculators</span></div><div class="stat"><b>$0</b><span>Free to use</span></div><div class="stat"><b>Instant</b><span>Deal verdicts</span></div></div></div><aside class="hero-card"><div class="mini-title">Sample Wholesale Analysis</div><div class="mini-row"><span>Contract Price</span><b>$44,000</b></div><div class="mini-row"><span>Buyer Price</span><b>$52,000</b></div><div class="mini-row"><span>Assignment Fee</span><b>$8,000</b></div><div class="mini-row"><span>Spread</span><b>18.2%</b></div><div class="verdict">Strong spread — verify title, access, utilities, flood zone, and buyer proof of funds.</div></aside></div></section>
-    <section id="calculators" class="section"><div class="wrap"><div class="section-head"><div><h2>Professional-grade calculators</h2><p>Pick a calculator. Enter the numbers. Get profit, percentage, risk, and verdict outputs immediately.</p></div></div><div class="tabs" id="tabs"></div><div class="calc-grid"><div id="calcBox"></div><div class="result" id="resultBox"></div></div></div></section>
-    <section id="tools" class="section"><div class="wrap"><h2>Built for real investor workflows</h2><p>DealCalc is structured around practical decisions: what to offer, whether a spread is worth pursuing, whether financing works, and whether a rental can support debt.</p><div class="cards"><div class="card"><span class="pill">Wholesaling</span><h3>Spread & exit analysis</h3><p>Calculate assignment fee, double close profit, spread percentage, and profit margin before presenting a deal.</p></div><div class="card"><span class="pill">Land</span><h3>Offer & ROI logic</h3><p>Estimate maximum offer, projected profit, ROI, annualized ROI, and holding-cost drag on vacant lots.</p></div><div class="card"><span class="pill">Rentals</span><h3>Debt & cash-flow metrics</h3><p>Measure DSCR, cap rate, cash-on-cash return, mortgage payment, and monthly cash flow.</p></div></div></div></section>
-    <section id="learn" class="section"><div class="wrap"><div class="newsletter"><div><h2>Grow DealCalc into your investor command center</h2><p>Next roadmap: individual calculator pages, downloadable reports, property due-diligence checklist, SEO guides, and AI deal summaries.</p></div><form class="subscribe" onsubmit="event.preventDefault();alert('Newsletter capture will be connected later.');"><input type="email" placeholder="Email address" required><button>Join</button></form></div></div></section>
-    <section id="faq" class="section"><div class="wrap"><h2>Frequently asked questions</h2><div class="faq"><div><h3>Are these calculators financial advice?</h3><p>No. DealCalc provides educational estimates. Investors should verify numbers with brokers, lenders, attorneys, title companies, and tax professionals.</p></div><div><h3>Why include percentages?</h3><p>Percentages make deals comparable. A $5,000 profit on a $20,000 deal is very different from $5,000 on a $200,000 deal.</p></div><div><h3>Can I use this for mortgage analysis?</h3><p>Yes. The mortgage, DSCR, cap rate, and cash-on-cash tools support residential rental analysis.</p></div><div><h3>What should be added next?</h3><p>Individual tool pages, downloadable PDF reports, article pages, Google Search Console, Analytics, and a working lead-capture form.</p></div></div><p class="disclaimer"><b>Disclaimer:</b> DealCalc.io is for informational and educational purposes only. Outputs are estimates based on user-entered assumptions and are not legal, financial, tax, lending, or investment advice.</p></div></section>
-  </main>
-  <footer class="footer"><div class="wrap footerin"><b>DealCalc.io</b><span>© 2026 DealCalc.io. All rights reserved.</span><span>Privacy · Terms · Contact</span></div></footer>
+<nav class="nav"><div class="wrap navin"><a href="/" class="logo">DealCalc<span>.io</span></a><div class="links"><a href="/#calculators">Calculators</a><a href="/learn.html">Learn</a><a href="/about.html">About</a><a href="/contact.html">Contact</a></div><a href="/#calculators" class="cta">Start Calculating</a></div></nav>
+
+<main>
+<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow"><i class="dot"></i>Real estate deal analysis platform</div><h1>Analyze deals. Calculate returns. Invest smarter.</h1><p class="lead">DealCalc.io gives wholesalers, land investors, landlords, and property buyers practical calculators for profit, ROI, financing, cash flow, and risk — no signup required.</p><div class="hero-actions"><a href="#calculators" class="cta">Browse Calculators</a><a href="/learn.html" class="secondary">Learn the Formulas</a></div><div class="stats"><div class="stat"><b>10</b><span>Live calculators</span></div><div class="stat"><b>$0</b><span>Free to use</span></div><div class="stat"><b>Instant</b><span>Deal verdicts</span></div></div></div><aside class="hero-card"><div class="mini-title">Sample Wholesale Analysis</div><div class="mini-row"><span>Contract Price</span><b>$44,000</b></div><div class="mini-row"><span>Buyer Price</span><b>$52,000</b></div><div class="mini-row"><span>Assignment Fee</span><b>$8,000</b></div><div class="mini-row"><span>Spread</span><b>18.2%</b></div><div class="verdict">Strong spread — verify title, access, utilities, flood zone, and buyer proof of funds.</div></aside></div></section>
+<section id="calculators" class="section"><div class="wrap"><div class="section-head"><div><h2>Professional-grade calculators</h2><p>Pick a calculator. Enter the numbers. Get profit, percentage, risk, and verdict outputs immediately.</p></div></div><div class="tabs" id="tabs"></div><div class="calc-grid"><div id="calcBox"></div><div class="result" id="resultBox"></div></div></div></section>
+<section id="tools" class="section"><div class="wrap"><h2>Built for real investor workflows</h2><p>DealCalc is structured around practical decisions: what to offer, whether a spread is worth pursuing, whether financing works, and whether a rental can support debt.</p><div class="cards"><div class="card"><span class="pill">Wholesaling</span><h3>Spread & exit analysis</h3><p>Calculate assignment fee, double close profit, spread percentage, and profit margin before presenting a deal.</p></div><div class="card"><span class="pill">Land</span><h3>Offer & ROI logic</h3><p>Estimate maximum offer, projected profit, ROI, annualized ROI, and holding-cost drag on vacant lots.</p></div><div class="card"><span class="pill">Rentals</span><h3>Debt & cash-flow metrics</h3><p>Measure DSCR, cap rate, cash-on-cash return, mortgage payment, and monthly cash flow.</p></div></div></div></section>
+<section id="learn" class="section"><div class="wrap"><div class="newsletter"><div><h2>Build stronger deal judgment</h2><p>Read the first DealCalc guides on assignment fees, double closings, MAO, vacant land wholesaling, and due diligence.</p></div><a class="cta" href="/learn.html">Open Learn Hub</a></div></div></section>
+<section id="faq" class="section"><div class="wrap"><h2>Frequently asked questions</h2><div class="faq"><div><h3>Are these calculators financial advice?</h3><p>No. DealCalc provides educational estimates. Investors should verify numbers with brokers, lenders, attorneys, title companies, and tax professionals.</p></div><div><h3>Why include percentages?</h3><p>Percentages make deals comparable. A $5,000 profit on a $20,000 deal is very different from $5,000 on a $200,000 deal.</p></div><div><h3>Can I use this for mortgage analysis?</h3><p>Yes. The mortgage, DSCR, cap rate, and cash-on-cash tools support residential rental analysis.</p></div><div><h3>What should be added next?</h3><p>Individual tool pages, downloadable PDF reports, more article pages, and eventually AI deal summaries.</p></div></div><p class="disclaimer"><b>Disclaimer:</b> DealCalc.io is for informational and educational purposes only. Outputs are estimates based on user-entered assumptions and are not legal, financial, tax, lending, or investment advice.</p></div></section>
+</main>
 <script>
 const fmt=n=>isFinite(n)?n.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}):'$0';
 const pct=n=>isFinite(n)?(n*100).toFixed(1)+'%':'0.0%';
 const num=id=>parseFloat(document.getElementById(id)?.value||0);
 const verdict=(score)=>score>=80?['Strong Deal','good']:score>=55?['Review Carefully','warn']:['Weak / Risky','bad'];
+function track(name){ if(typeof gtag==='function'){ gtag('event', name); } }
 const calculators=[
-{name:'Assignment Fee',desc:'Wholesale spread, margin, and fee percent.',fields:[['contract','Contract Price',44000],['buyer','Buyer Price',52000],['costs','Marketing / Transaction Costs',500]],calc:()=>{let c=num('contract'),b=num('buyer'),cost=num('costs'),fee=b-c,net=fee-cost,spread=fee/c,margin=net/b,score=Math.min(100,Math.max(0,spread*300+margin*120));return [['Assignment Fee',fmt(fee)],['Net Profit After Costs',fmt(net)],['Spread %',pct(spread)],['Net Margin',pct(margin)],...v(score)]}},
-{name:'Double Close',desc:'A-B to B-C profit with two closing-cost layers.',fields:[['ab','A-B Purchase Price',44000],['bc','B-C Sale Price',52000],['abclose','A-B Closing Costs',1200],['bcclose','B-C Closing Costs',1200],['funding','Transactional Funding Fee',800]],calc:()=>{let ab=num('ab'),bc=num('bc'),cost=num('abclose')+num('bcclose')+num('funding'),gross=bc-ab,net=gross-cost,roi=net/(ab+cost),margin=net/bc,score=Math.min(100,Math.max(0,margin*350+roi*120));return [['Gross Spread',fmt(gross)],['Total Deal Costs',fmt(cost)],['Net Double-Close Profit',fmt(net)],['ROI on Capital + Costs',pct(roi)],['Net Margin',pct(margin)],...v(score)]}},
-{name:'Land Offer',desc:'Back into maximum offer from resale value and target profit.',fields:[['arv','Estimated Resale Value',75000],['profit','Target Profit',12000],['close','Closing / Title Costs',2500],['hold','Holding + Marketing Costs',1500],['buffer','Risk Buffer %',10,'percent']],calc:()=>{let arv=num('arv'),profit=num('profit'),cost=num('close')+num('hold'),buffer=arv*num('buffer')/100,offer=arv-profit-cost-buffer,discount=1-offer/arv,score=Math.min(100,Math.max(0,discount*140));return [['Maximum Offer',fmt(offer)],['All-In Cost Reserve',fmt(cost+buffer)],['Required Discount to Value',pct(discount)],['Projected Profit',fmt(profit)],...v(score)]}},
-{name:'Seller Finance',desc:'Monthly payment, total interest, and loan-to-value.',fields:[['price','Purchase Price',75000],['down','Down Payment',10000],['rate','Interest Rate %',8,'percent'],['term','Term Years',5]],calc:()=>{let price=num('price'),down=num('down'),r=num('rate')/100/12,n=num('term')*12,loan=price-down,pmt=r?loan*r/(1-Math.pow(1+r,-n)):loan/n,total=pmt*n,interest=total-loan,ltv=loan/price,score=Math.min(100,Math.max(0,(1-ltv)*80+(pmt<1000?25:0)+(num('rate')<10?15:0)));return [['Loan Amount',fmt(loan)],['Monthly Payment',fmt(pmt)],['Total Interest',fmt(interest)],['Loan-to-Value',pct(ltv)],...v(score)]}},
-{name:'Land ROI',desc:'Profit, ROI, annualized ROI, and holding-cost drag.',fields:[['purchase','Purchase Price',44000],['sale','Sale Price',65000],['closing','Closing + Selling Costs',4500],['holding','Monthly Holding Cost',75],['months','Hold Period Months',9]],calc:()=>{let p=num('purchase'),s=num('sale'),cost=num('closing')+num('holding')*num('months'),profit=s-p-cost,roi=profit/(p+cost),annual=Math.pow(1+roi,12/Math.max(num('months'),1))-1,drag=(num('holding')*num('months'))/p,score=Math.min(100,Math.max(0,roi*150+annual*40-drag*80));return [['Net Profit',fmt(profit)],['Total Costs',fmt(cost)],['ROI',pct(roi)],['Annualized ROI',pct(annual)],['Holding-Cost Drag',pct(drag)],...v(score)]}},
-{name:'Wholesale Analyzer',desc:'MAO-style deal score with rehab, ARV, and target profit.',fields:[['arv2','ARV / End Value',180000],['price2','Seller Asking Price',125000],['rehab','Estimated Rehab / Improvement',25000],['profit2','Target Profit',15000],['rule','Investor Rule % of ARV',70,'percent']],calc:()=>{let arv=num('arv2'),ask=num('price2'),reh=num('rehab'),prof=num('profit2'),rule=num('rule')/100,mao=arv*rule-reh-prof,room=mao-ask,score=Math.min(100,Math.max(0,50+(room/arv)*250));return [['Maximum Allowable Offer',fmt(mao)],['Offer Room vs Asking',fmt(room)],['All-In Before Profit',fmt(ask+reh)],['Target Profit',fmt(prof)],...v(score)]}},
-{name:'Cap Rate',desc:'NOI yield relative to purchase price.',fields:[['rent','Monthly Rent',2200],['vacancy','Vacancy %',5,'percent'],['opex','Monthly Operating Expenses',750],['capprice','Purchase Price',240000]],calc:()=>{let inc=num('rent')*12*(1-num('vacancy')/100),noi=inc-num('opex')*12,cap=noi/num('capprice'),score=Math.min(100,Math.max(0,cap*900));return [['Annual Gross Income',fmt(inc)],['NOI',fmt(noi)],['Cap Rate',pct(cap)],['Monthly NOI',fmt(noi/12)],...v(score)]}},
-{name:'Cash-on-Cash',desc:'Annual pre-tax cash flow on cash invested.',fields:[['cashflow','Monthly Cash Flow',350],['down2','Down Payment',48000],['close2','Closing Costs',6000],['repairs2','Initial Repairs',8000]],calc:()=>{let annual=num('cashflow')*12,cash=num('down2')+num('close2')+num('repairs2'),coc=annual/cash,payback=cash/Math.max(annual,1),score=Math.min(100,Math.max(0,coc*600+(payback<8?20:0)));return [['Annual Cash Flow',fmt(annual)],['Total Cash Invested',fmt(cash)],['Cash-on-Cash Return',pct(coc)],['Payback Period',payback.toFixed(1)+' years'],...v(score)]}},
-{name:'DSCR',desc:'Debt service coverage for rental financing.',fields:[['noi','Annual NOI',24000],['debt','Annual Debt Service',18000],['minDscr','Target DSCR',1.25]],calc:()=>{let dscr=num('noi')/num('debt'),surplus=num('noi')-num('debt'),needed=num('debt')*num('minDscr'),gap=num('noi')-needed,score=Math.min(100,Math.max(0,(dscr-1)*120));return [['DSCR',dscr.toFixed(2)+'x'],['Annual Cash Flow Before Tax',fmt(surplus)],['NOI Needed at Target',fmt(needed)],['Surplus / Gap vs Target',fmt(gap)],...v(score)]}},
-{name:'Mortgage Payment',desc:'Monthly principal and interest plus estimated taxes/insurance.',fields:[['home','Home Price',300000],['downpct','Down Payment %',20,'percent'],['mortRate','Interest Rate %',6.75,'percent'],['years','Loan Term Years',30],['taxins','Monthly Taxes + Insurance',450]],calc:()=>{let price=num('home'),down=price*num('downpct')/100,loan=price-down,r=num('mortRate')/100/12,n=num('years')*12,pi=r?loan*r/(1-Math.pow(1+r,-n)):loan/n,total=pi+num('taxins'),ltv=loan/price;return [['Loan Amount',fmt(loan)],['Principal & Interest',fmt(pi)],['Est. Total Monthly Payment',fmt(total)],['Down Payment',fmt(down)],['Loan-to-Value',pct(ltv)],['Verdict','Payment estimate']]}}
+{name:'Assignment Fee',event:'assignment_fee_calculated',desc:'Wholesale spread, margin, and fee percent.',fields:[['contract','Contract Price',44000],['buyer','Buyer Price',52000],['costs','Marketing / Transaction Costs',500]],calc:()=>{let c=num('contract'),b=num('buyer'),cost=num('costs'),fee=b-c,net=fee-cost,spread=fee/c,margin=net/b,score=Math.min(100,Math.max(0,spread*300+margin*120));return [['Assignment Fee',fmt(fee)],['Net Profit After Costs',fmt(net)],['Spread %',pct(spread)],['Net Margin',pct(margin)],...v(score)]}},
+{name:'Double Close',event:'double_close_calculated',desc:'A-B to B-C profit with two closing-cost layers.',fields:[['ab','A-B Purchase Price',44000],['bc','B-C Sale Price',52000],['abclose','A-B Closing Costs',1200],['bcclose','B-C Closing Costs',1200],['funding','Transactional Funding Fee',800]],calc:()=>{let ab=num('ab'),bc=num('bc'),cost=num('abclose')+num('bcclose')+num('funding'),gross=bc-ab,net=gross-cost,roi=net/(ab+cost),margin=net/bc,score=Math.min(100,Math.max(0,margin*350+roi*120));return [['Gross Spread',fmt(gross)],['Total Deal Costs',fmt(cost)],['Net Double-Close Profit',fmt(net)],['ROI on Capital + Costs',pct(roi)],['Net Margin',pct(margin)],...v(score)]}},
+{name:'Land Offer',event:'land_offer_calculated',desc:'Back into maximum offer from resale value and target profit.',fields:[['arv','Estimated Resale Value',75000],['profit','Target Profit',12000],['close','Closing / Title Costs',2500],['hold','Holding + Marketing Costs',1500],['buffer','Risk Buffer %',10]],calc:()=>{let arv=num('arv'),profit=num('profit'),cost=num('close')+num('hold'),buffer=arv*num('buffer')/100,offer=arv-profit-cost-buffer,discount=1-offer/arv,score=Math.min(100,Math.max(0,discount*140));return [['Maximum Offer',fmt(offer)],['All-In Cost Reserve',fmt(cost+buffer)],['Required Discount to Value',pct(discount)],['Projected Profit',fmt(profit)],...v(score)]}},
+{name:'Seller Finance',event:'seller_finance_calculated',desc:'Monthly payment, total interest, and loan-to-value.',fields:[['price','Purchase Price',75000],['down','Down Payment',10000],['rate','Interest Rate %',8],['term','Term Years',5]],calc:()=>{let price=num('price'),down=num('down'),r=num('rate')/100/12,n=num('term')*12,loan=price-down,pmt=r?loan*r/(1-Math.pow(1+r,-n)):loan/n,total=pmt*n,interest=total-loan,ltv=loan/price,score=Math.min(100,Math.max(0,(1-ltv)*80+(pmt<1000?25:0)+(num('rate')<10?15:0)));return [['Loan Amount',fmt(loan)],['Monthly Payment',fmt(pmt)],['Total Interest',fmt(interest)],['Loan-to-Value',pct(ltv)],...v(score)]}},
+{name:'Land ROI',event:'land_roi_calculated',desc:'Profit, ROI, annualized ROI, and holding-cost drag.',fields:[['purchase','Purchase Price',44000],['sale','Sale Price',65000],['closing','Closing + Selling Costs',4500],['holding','Monthly Holding Cost',75],['months','Hold Period Months',9]],calc:()=>{let p=num('purchase'),s=num('sale'),cost=num('closing')+num('holding')*num('months'),profit=s-p-cost,roi=profit/(p+cost),annual=Math.pow(1+roi,12/Math.max(num('months'),1))-1,drag=(num('holding')*num('months'))/p,score=Math.min(100,Math.max(0,roi*150+annual*40-drag*80));return [['Net Profit',fmt(profit)],['Total Costs',fmt(cost)],['ROI',pct(roi)],['Annualized ROI',pct(annual)],['Holding-Cost Drag',pct(drag)],...v(score)]}},
+{name:'Wholesale Analyzer',event:'wholesale_analyzer_calculated',desc:'MAO-style deal score with rehab, ARV, and target profit.',fields:[['arv2','ARV / End Value',180000],['price2','Seller Asking Price',125000],['rehab','Estimated Rehab / Improvement',25000],['profit2','Target Profit',15000],['rule','Investor Rule % of ARV',70]],calc:()=>{let arv=num('arv2'),ask=num('price2'),reh=num('rehab'),prof=num('profit2'),rule=num('rule')/100,mao=arv*rule-reh-prof,room=mao-ask,score=Math.min(100,Math.max(0,50+(room/arv)*250));return [['Maximum Allowable Offer',fmt(mao)],['Offer Room vs Asking',fmt(room)],['All-In Before Profit',fmt(ask+reh)],['Target Profit',fmt(prof)],...v(score)]}},
+{name:'Cap Rate',event:'cap_rate_calculated',desc:'NOI yield relative to purchase price.',fields:[['rent','Monthly Rent',2200],['vacancy','Vacancy %',5],['opex','Monthly Operating Expenses',750],['capprice','Purchase Price',240000]],calc:()=>{let inc=num('rent')*12*(1-num('vacancy')/100),noi=inc-num('opex')*12,cap=noi/num('capprice'),score=Math.min(100,Math.max(0,cap*900));return [['Annual Gross Income',fmt(inc)],['NOI',fmt(noi)],['Cap Rate',pct(cap)],['Monthly NOI',fmt(noi/12)],...v(score)]}},
+{name:'Cash-on-Cash',event:'cash_on_cash_calculated',desc:'Annual pre-tax cash flow on cash invested.',fields:[['cashflow','Monthly Cash Flow',350],['down2','Down Payment',48000],['close2','Closing Costs',6000],['repairs2','Initial Repairs',8000]],calc:()=>{let annual=num('cashflow')*12,cash=num('down2')+num('close2')+num('repairs2'),coc=annual/cash,payback=cash/Math.max(annual,1),score=Math.min(100,Math.max(0,coc*600+(payback<8?20:0)));return [['Annual Cash Flow',fmt(annual)],['Total Cash Invested',fmt(cash)],['Cash-on-Cash Return',pct(coc)],['Payback Period',payback.toFixed(1)+' years'],...v(score)]}},
+{name:'DSCR',event:'dscr_calculated',desc:'Debt service coverage for rental financing.',fields:[['noi','Annual NOI',24000],['debt','Annual Debt Service',18000],['minDscr','Target DSCR',1.25]],calc:()=>{let dscr=num('noi')/num('debt'),surplus=num('noi')-num('debt'),needed=num('debt')*num('minDscr'),gap=num('noi')-needed,score=Math.min(100,Math.max(0,(dscr-1)*120));return [['DSCR',dscr.toFixed(2)+'x'],['Annual Cash Flow Before Tax',fmt(surplus)],['NOI Needed at Target',fmt(needed)],['Surplus / Gap vs Target',fmt(gap)],...v(score)]}},
+{name:'Mortgage Payment',event:'mortgage_calculated',desc:'Monthly principal and interest plus estimated taxes/insurance.',fields:[['home','Home Price',300000],['downpct','Down Payment %',20],['mortRate','Interest Rate %',6.75],['years','Loan Term Years',30],['taxins','Monthly Taxes + Insurance',450]],calc:()=>{let price=num('home'),down=price*num('downpct')/100,loan=price-down,r=num('mortRate')/100/12,n=num('years')*12,pi=r?loan*r/(1-Math.pow(1+r,-n)):loan/n,total=pi+num('taxins'),ltv=loan/price;return [['Loan Amount',fmt(loan)],['Principal & Interest',fmt(pi)],['Est. Total Monthly Payment',fmt(total)],['Down Payment',fmt(down)],['Loan-to-Value',pct(ltv)],['Verdict','Payment estimate']]}}
 ];
 function v(score){let [label,cls]=verdict(score);return [['Deal Score',Math.round(score)+'/100'],['Verdict',`<span class="badge ${cls}">${label}</span>`]]}
 function renderTabs(){tabs.innerHTML=calculators.map((c,i)=>`<button class="tab ${i===0?'active':''}" onclick="selectCalc(${i})">${c.name}</button>`).join('')}
-function selectCalc(i){document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));let c=calculators[i];calcBox.innerHTML=`<div class="calc active"><div class="calc-head"><h3>${c.name} Calculator</h3><p>${c.desc}</p></div><div class="calc-body"><div class="form">${c.fields.map(f=>`<div><label>${f[1]}</label><input id="${f[0]}" type="number" step="any" value="${f[2]}" oninput="runCalc(${i})"></div>`).join('')}</div><p class="small">Outputs update automatically as you change assumptions.</p></div></div>`;runCalc(i)}
-function runCalc(i){let rows=calculators[i].calc();resultBox.innerHTML=`<div class="mini-title">Analysis Output</div>${rows.map(r=>`<div class="metric"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}<p class="small" style="color:#cbd5e1">Educational estimate only. Verify assumptions before making an offer or investment decision.</p>`}
+function selectCalc(i){document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));let c=calculators[i];calcBox.innerHTML=`<div class="calc active"><div class="calc-head"><h3>${c.name} Calculator</h3><p>${c.desc}</p></div><div class="calc-body"><div class="form">${c.fields.map(f=>`<div><label>${f[1]}</label><input id="${f[0]}" type="number" step="any" value="${f[2]}" oninput="runCalc(${i})"></div>`).join('')}</div><p class="small">Outputs update automatically as you change assumptions. Calculator usage is tracked anonymously to improve the site.</p></div></div>`;track('calculator_view_'+c.event.replace('_calculated',''));runCalc(i)}
+function runCalc(i){let rows=calculators[i].calc();resultBox.innerHTML=`<div class="mini-title">Analysis Output</div>${rows.map(r=>`<div class="metric"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}<p class="small" style="color:#cbd5e1">Educational estimate only. Verify assumptions before making an offer or investment decision.</p>`; clearTimeout(window.calcTrackTimer); window.calcTrackTimer=setTimeout(()=>track(calculators[i].event),700)}
 renderTabs();selectCalc(0);
 </script>
+
+<footer class="footer"><div class="wrap footerin"><b>DealCalc.io</b><span>© 2026 DealCalc.io. All rights reserved.</span><span><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/contact.html">Contact</a></span></div></footer>
 </body>
 </html>
