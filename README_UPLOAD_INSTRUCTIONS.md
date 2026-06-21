@@ -1,40 +1,33 @@
-# DealCalc Full Update V12
+# DealCalc Full Update V13
 
-This is the one-upload fix for the calculator folder issue.
+Upload the full contents of this folder into the GitHub repository root and overwrite existing files.
 
-## What changed
+## What V13 fixes
 
-- Rebuilt the live `/calculator/` folder with 10 unique calculator pages.
-- Mirrored the same fixed pages into `/calculators/` so the duplicate folder no longer causes confusion.
-- Updated `calculators.html` as the main calculator directory.
-- Added `/calculator/index.html` and `/calculators/index.html` directory pages.
-- Added `assets/js/calculators-v12.js` with unique formulas for every calculator.
-- Updated styling for calculator navigation links and result insight boxes.
+- Places the Other Calculators navigation strip directly between the hero message and calculator form.
+- Keeps both `/calculator/` and `/calculators/` folders synchronized, but the public navigation uses `/calculator/`.
+- Updates every calculator page to V13 markers and cache-busted `assets/js/calculators-v13.js`.
+- Adds dedicated formulas, dedicated input fields, current-tool highlighting, and internal links across all 10 calculators.
+- Improves mobile layout, focus states, sticky results, footer consistency, and calculator page SEO schema.
 
-## Important upload instruction
+## Upload checklist
 
-Upload the CONTENTS of this folder to the GitHub repository root and choose replace/overwrite when prompted.
+Replace these folders/files:
 
-After upload, the live page:
-`/calculator/cap-rate-calculator.html`
-should show fields for:
-- Property Value / Purchase Price
-- Annual Gross Rent
-- Vacancy %
-- Annual Operating Expenses
-- Target Cap Rate %
+```text
+calculator/
+calculators/
+assets/js/calculators-v13.js
+assets/css/styles.css
+calculators.html
+README_UPLOAD_INSTRUCTIONS.md
+```
 
-It should NOT show ARV / Repair Costs / Assignment Fee / Rule %.
+After Vercel deploys, open:
 
-## Files/folders that must be replaced
+```text
+https://www.dealcalc.io/calculator/land-flip-calculator.html
+https://www.dealcalc.io/calculator/cap-rate-calculator.html
+```
 
-- `calculator/`
-- `calculators/`
-- `calculators.html`
-- `assets/js/calculators-v12.js`
-- `assets/css/styles.css`
-
-## Verification markers
-
-Each fixed calculator page contains this marker near the top:
-`DEALCALC CALCULATOR V12`
+You should see an Other Calculators card strip between the hero and the calculator form.
