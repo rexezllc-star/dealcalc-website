@@ -1,118 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DealCalc.io</title>
-
-<style>
-body{
-font-family: Arial, sans-serif;
-margin:0;
-background:#f8fafc;
-color:#111827;
-}
-
-header{
-padding:80px 20px;
-text-align:center;
-background:white;
-}
-
-h1{
-font-size:56px;
-margin-bottom:10px;
-}
-
-.subtitle{
-font-size:22px;
-color:#6b7280;
-}
-
-.container{
-max-width:1200px;
-margin:auto;
-padding:40px 20px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-
-.card{
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 2px 10px rgba(0,0,0,.08);
-}
-
-.card h3{
-margin-top:0;
-}
-
-footer{
-text-align:center;
-padding:40px;
-color:#6b7280;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DealCalc.io | Real Estate Investment Calculators</title>
+  <meta name="description" content="Free real estate investment calculators for wholesalers, land investors, landlords, and property buyers. Analyze deals, calculate returns, and invest smarter." />
+  <style>
+    :root{
+      --bg:#f6f8fb; --surface:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+      --brand:#2563eb; --brand2:#0f172a; --soft:#eff6ff; --good:#16a34a; --warn:#d97706;
+      --shadow:0 20px 50px rgba(15,23,42,.08); --radius:22px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+    a{text-decoration:none;color:inherit}.wrap{max-width:1180px;margin:auto;padding:0 22px}.nav{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.86);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    .navin{height:72px;display:flex;align-items:center;justify-content:space-between}.logo{font-weight:900;font-size:23px;letter-spacing:-.04em}.logo span{color:var(--brand)}
+    .links{display:flex;gap:26px;color:var(--muted);font-size:14px;font-weight:650}.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:13px 20px;font-weight:800;border:1px solid transparent;cursor:pointer}.btn.primary{background:var(--brand);color:white;box-shadow:0 12px 26px rgba(37,99,235,.25)}.btn.secondary{background:white;border-color:var(--line);color:var(--ink)}
+    .hero{padding:86px 0 56px;background:radial-gradient(circle at top right,#dbeafe,transparent 35%),linear-gradient(180deg,#fff,#f8fafc)}.heroGrid{display:grid;grid-template-columns:1.12fr .88fr;gap:42px;align-items:center}.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--soft);color:#1d4ed8;border:1px solid #bfdbfe;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:800}.hero h1{font-size:64px;line-height:.98;letter-spacing:-.065em;margin:20px 0 18px}.hero p{font-size:20px;color:var(--muted);max-width:700px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.heroCard{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:26px}.metric{display:flex;justify-content:space-between;padding:18px;border:1px solid var(--line);border-radius:18px;margin:12px 0;background:#fff}.metric b{font-size:28px;letter-spacing:-.04em}.metric span{color:var(--muted);font-size:13px;font-weight:700}.section{padding:68px 0}.sectionTitle{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:24px}.section h2{font-size:36px;letter-spacing:-.045em;margin:0}.sectionTitle p{margin:8px 0 0;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 10px 24px rgba(15,23,42,.04);transition:.18s}.card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.icon{width:44px;height:44px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}.card h3{font-size:20px;line-height:1.1;margin:0 0 10px;letter-spacing:-.025em}.card p{color:var(--muted);margin:0 0 18px}.tag{font-size:12px;font-weight:850;color:#1d4ed8;background:#dbeafe;border-radius:999px;padding:6px 10px;display:inline-flex}.calcBox{background:#0f172a;color:white;border-radius:30px;padding:30px;box-shadow:var(--shadow)}.calcGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.field label{display:block;color:#cbd5e1;font-size:13px;font-weight:800;margin-bottom:8px}.field input{width:100%;padding:16px;border-radius:15px;border:1px solid #334155;background:#111827;color:white;font-size:18px;outline:none}.result{background:linear-gradient(135deg,#2563eb,#1e40af);border-radius:24px;padding:26px;margin-top:20px}.result span{display:block;color:#bfdbfe;font-weight:800;font-size:13px}.result b{display:block;font-size:44px;letter-spacing:-.05em;margin-top:4px}.learn{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.article{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}.article small{font-weight:900;color:var(--brand)}.article h3{margin:8px 0 8px;letter-spacing:-.03em}.article p{margin:0;color:var(--muted)}footer{padding:38px 0;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.footlinks{display:flex;gap:18px}.coming{opacity:.67}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;font-size:13px;font-weight:800;color:var(--muted)}
+    @media(max-width:860px){.heroGrid,.calcGrid{grid-template-columns:1fr}.grid,.learn{grid-template-columns:1fr}.hero h1{font-size:44px}.links{display:none}.sectionTitle{display:block}.hero{padding-top:58px}}
+  </style>
 </head>
-
 <body>
-
-<header>
-<h1>DealCalc.io</h1>
-
-<p class="subtitle">
-Analyze Deals. Calculate Returns. Invest Smarter.
-</p>
-</header>
-
-<div class="container">
-
-<h2>Featured Calculators</h2>
-
-<div class="grid">
-
-<div class="card">
-<h3>Assignment Fee Calculator</h3>
-<p>Calculate wholesale spreads instantly.</p>
-</div>
-
-<div class="card">
-<h3>Double Close Calculator</h3>
-<p>Estimate profits from double closings.</p>
-</div>
-
-<div class="card">
-<h3>Land Offer Calculator</h3>
-<p>Determine your maximum offer price.</p>
-</div>
-
-<div class="card">
-<h3>Seller Financing Calculator</h3>
-<p>Calculate payments and terms.</p>
-</div>
-
-<div class="card">
-<h3>Land ROI Calculator</h3>
-<p>Analyze land investment returns.</p>
-</div>
-
-<div class="card">
-<h3>Wholesale Deal Analyzer</h3>
-<p>Quickly score potential deals.</p>
-</div>
-
-</div>
-
-</div>
-
-<footer>
-© 2026 DealCalc.io
-</footer>
-
+  <nav class="nav"><div class="wrap navin"><a href="#" class="logo">DealCalc<span>.io</span></a><div class="links"><a href="#calculators">Calculators</a><a href="#assignment">Assignment Fee</a><a href="#learn">Learn</a><a href="#contact">Contact</a></div><a class="btn secondary" href="#calculators">Browse Tools</a></div></nav>
+  <main>
+    <section class="hero"><div class="wrap heroGrid"><div><div class="eyebrow">Free real estate analysis tools</div><h1>Analyze deals. Calculate returns. Invest smarter.</h1><p>Professional-grade calculators for wholesalers, land investors, landlords, and property buyers. Start with simple deal math and grow into smarter investment decisions.</p><div class="actions"><a class="btn primary" href="#assignment">Try Assignment Calculator</a><a class="btn secondary" href="#calculators">Browse Calculators</a></div></div><div class="heroCard"><div class="metric"><span>Wholesale Spread</span><b>$8,000</b></div><div class="metric"><span>Deal Type</span><b>Land</b></div><div class="metric"><span>Tools Live</span><b>6</b></div><div class="pill">Coming soon: DSCR, Cap Rate, Mortgage & Rental ROI</div></div></div></section>
+    <section class="section" id="calculators"><div class="wrap"><div class="sectionTitle"><div><h2>Featured calculators</h2><p>Start with land and wholesaling tools, then expand into rental and financing analysis.</p></div></div><div class="grid"><a class="card" href="#assignment"><div class="icon">📊</div><h3>Assignment Fee Calculator</h3><p>Calculate your wholesale spread from contract price to buyer price.</p><span class="tag">Live</span></a><div class="card"><div class="icon">💰</div><h3>Double Close Calculator</h3><p>Estimate net profit after A-B price, B-C price, and closing costs.</p><span class="tag">MVP</span></div><div class="card"><div class="icon">🏞️</div><h3>Land Offer Calculator</h3><p>Back into your maximum offer based on resale value and target profit.</p><span class="tag">MVP</span></div><div class="card"><div class="icon">🏦</div><h3>Seller Financing Calculator</h3><p>Estimate monthly payments based on down payment, rate, and term.</p><span class="tag">MVP</span></div><div class="card"><div class="icon">📈</div><h3>Land ROI Calculator</h3><p>Analyze profit and return from purchase, holding costs, and resale price.</p><span class="tag">MVP</span></div><div class="card"><div class="icon">🎯</div><h3>Wholesale Deal Analyzer</h3><p>Score a deal quickly using offer price, value, costs, and target profit.</p><span class="tag">MVP</span></div></div></div></section>
+    <section class="section" id="assignment"><div class="wrap"><div class="sectionTitle"><div><h2>Assignment Fee Calculator</h2><p>Enter your contract price and buyer price to calculate your potential assignment fee.</p></div></div><div class="calcBox"><div class="calcGrid"><div class="field"><label>Contract Price</label><input id="contractPrice" type="number" value="44000" min="0" oninput="calcAssignment()"></div><div class="field"><label>Buyer Price</label><input id="buyerPrice" type="number" value="52000" min="0" oninput="calcAssignment()"></div></div><div class="result"><span>Estimated Assignment Fee</span><b id="assignmentResult">$8,000</b></div></div></div></section>
+    <section class="section" id="learn"><div class="wrap"><div class="sectionTitle"><div><h2>Learn deal analysis</h2><p>SEO articles to help users understand the calculators and bring Google traffic over time.</p></div></div><div class="learn"><div class="article"><small>Wholesaling</small><h3>What Is an Assignment Fee?</h3><p>A beginner-friendly guide to wholesale spreads and how assignment fees are calculated.</p></div><div class="article"><small>Land Investing</small><h3>How to Calculate a Land Offer</h3><p>How investors determine a maximum offer using resale value, costs, and profit targets.</p></div><div class="article"><small>Closings</small><h3>Double Close vs Assignment</h3><p>Understand when investors use assignments, double closes, and related cost tradeoffs.</p></div></div></div></section>
+  </main>
+  <footer id="contact"><div class="wrap foot"><div>© 2026 DealCalc.io. Built for real estate investors.</div><div class="footlinks"><a href="#">Privacy</a><a href="#">Terms</a><a href="mailto:hello@dealcalc.io">Contact</a></div></div></footer>
+  <script>
+    function money(n){return (n||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});}
+    function calcAssignment(){const contract=Number(document.getElementById('contractPrice').value)||0;const buyer=Number(document.getElementById('buyerPrice').value)||0;const fee=buyer-contract;document.getElementById('assignmentResult').textContent=money(fee);}calcAssignment();
+  </script>
 </body>
 </html>
