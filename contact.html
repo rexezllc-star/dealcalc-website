@@ -27,10 +27,47 @@
     <a href="/contact.html">Contact</a>
   </nav>
 </header>
-<main><section class="article"><p class="eyebrow">Contact</p><h1>Contact DealCalc</h1><p>Have feedback, a partnership idea, or a product question? Send a message below.</p><form data-track-form="contact" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORMSPREE_ID" method="POST" class="card"><label>Name</label><input name="name" required><label>Email</label><input type="email" name="email" required><label>Message</label><textarea name="message" required></textarea><p><button class="btn" type="submit">Send Message</button></p><p class="muted">Replace the Formspree endpoint with your own form ID.</p></form></section></main>
+<main>
+  <section class="article">
+    <p class="eyebrow">Contact</p>
+    <h1>Contact DealCalc</h1>
+    <p>Have feedback, a partnership idea, a bug report, or a product question? Send a message below or email us directly.</p>
+    <div class="grid two">
+      <form data-track-form="contact" action="https://formspree.io/f/REPLACE_WITH_YOUR_FORMSPREE_ID" method="POST" class="card">
+        <label>Reason for Contact</label>
+        <select name="reason" required>
+          <option value="General Question">General Question</option>
+          <option value="Feature Request">Feature Request</option>
+          <option value="Product Feedback">Product Feedback</option>
+          <option value="Partnership Opportunity">Partnership Opportunity</option>
+          <option value="Bug Report">Bug Report</option>
+          <option value="Advertising Inquiry">Advertising Inquiry</option>
+          <option value="Other">Other</option>
+        </select>
+        <label>Name</label><input name="name" required>
+        <label>Email</label><input type="email" name="email" required>
+        <label>Message</label><textarea name="message" required></textarea>
+        <p><button class="btn" type="submit">Send Message</button></p>
+        <p class="muted">Replace the Formspree endpoint with your own form ID.</p>
+      </form>
+      <div class="card contact-card">
+        <h2>Email</h2>
+        <p><a class="large-link" href="mailto:info@dealcalc.io">info@dealcalc.io</a></p>
+        <h3>Response Time</h3>
+        <p class="muted">Typical response time: within 24–48 hours.</p>
+        <h3>What to send</h3>
+        <ul class="small-list"><li>Product feedback</li><li>Feature requests</li><li>Partnership inquiries</li><li>Bug reports</li><li>Advertising questions</li></ul>
+      </div>
+    </div>
+  </section>
+</main>
 <footer class="site-footer">
   <div><strong>DealCalc.io</strong><p>Real estate deal analysis tools for wholesalers, land investors, flippers, and buy-and-hold investors.</p></div>
-  <div><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a></div>
+  <div><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a><a href="mailto:info@dealcalc.io">info@dealcalc.io</a></div>
 </footer>
 <script src="/assets/js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-config.js"></script>
+<script src="/assets/js/auth.js"></script>
 </body></html>

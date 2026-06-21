@@ -171,7 +171,7 @@ function analyzeDealV6(manual=false){
     <h3>What this means</h3><ul class="small-list">${bullets}</ul>
     <h3>Next checks</h3><ol class="small-list">${steps}</ol>
     <p class="muted tiny-note">Educational estimate only. DealCalc does not replace professional appraisal, inspection, legal, tax, financing, or title review.</p>
-    <p><button class="btn secondary" onclick="window.print()">Print / Save Report</button></p>`;
+    <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Print / Save Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
   trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:risk,manual:manual});
 }
 
@@ -197,3 +197,176 @@ function clearAnalyzer(){['propertyLabel','listingPrice','purchasePrice','analyz
 document.addEventListener('input',e=>{if(e.target.closest('.compact-input-card')){clearTimeout(window.__dcTimer); window.__dcTimer=setTimeout(()=>analyzeDealV6(false),350)}});
 document.addEventListener('submit',e=>{if(e.target.matches('[data-track-form]'))trackEvent('contact_submit',{form:e.target.dataset.trackForm})});
 document.addEventListener('DOMContentLoaded',updateAnalyzerMode);
+
+/* =========================
+   DEALCALC V7 ANALYZER OVERRIDES
+   Fixes: repeated uploads, upload resets, source-aware CMA valuation, richer investor insights.
+========================= */
+function median(arr){const a=arr.filter(n=>Number.isFinite(n)&&n>0).sort((x,y)=>x-y); if(!a.length)return 0; const m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2;}
+function uniqNums(arr){return [...new Set(arr.map(n=>Math.round(n)))];}
+function moneyList(section){return uniqNums([...String(section||'').matchAll(/\$\s*([0-9][0-9,]*(?:\.\d+)?)/g)].map(m=>+m[1].replace(/,/g,'')));}
+function sectionBetween(text,start,end){const s=String(text||''); const i=s.search(new RegExp(start,'i')); if(i<0)return ''; const rest=s.slice(i); const j=rest.search(new RegExp(end,'i')); return j>0?rest.slice(0,j):rest;}
+function getMarketSignals(text, propertyType, sqft){
+  const raw=String(text||'').replace(/\s+/g,' ');
+  const compSec=sectionBetween(raw,'COMPARABLES','NEARBY LISTINGS');
+  const nearSec=sectionBetween(raw,'NEARBY LISTINGS','Property Images|Statistics|Page 5|Page 6|Page 7|Page 8');
+  let compDollars=moneyList(compSec).filter(n=>n>=1000);
+  let activeDollars=moneyList(nearSec).filter(n=>n>=1000);
+  const ppsfVals=uniqNums([...raw.matchAll(/\$\s*([1-9][0-9]{1,3})\s+(?:\d|[A-Z])/g)].map(m=>+m[1])).filter(n=>n>=50&&n<=800);
+  if(propertyType==='land'){
+    const landComps=compDollars.filter(n=>n>=2000 && n<=100000);
+    const landListings=activeDollars.filter(n=>n>=2000 && n<=125000);
+    return {landCompMedian:median(landComps),landListingMedian:median(landListings),landCompCount:landComps.length,landListingCount:landListings.length,ppsfMedian:0,compMedian:median(landComps),activeMedian:median(landListings)};
+  }
+  const saleComps=compDollars.filter(n=>n>=100000 && n<=1500000);
+  const activeListings=activeDollars.filter(n=>n>=100000 && n<=2000000);
+  const ppsfMedian=median(ppsfVals);
+  const ppsfValue=(ppsfMedian && sqft)?ppsfMedian*sqft:0;
+  return {saleCompMedian:median(saleComps),activeListingMedian:median(activeListings),saleCompCount:saleComps.length,activeListingCount:activeListings.length,ppsfMedian,ppsfValue,compMedian:median(saleComps),activeMedian:median(activeListings)};
+}
+function detectFromText(text){
+  const raw=String(text||''); const t=raw.replace(/\s+/g,' ');
+  const data={raw};
+  data.address=parseAddress(raw);
+  data.estimatedValue=parseMoneyAfter(t,['Estimated Value','Market Value']);
+  data.listingPrice=parseMoneyAfter(t,['Current Listing Status.*?Price','List Price','Listing Price']);
+  data.avgSalePrice=parseMoneyAfter(t,['Avg\\.? Sale Price','Average Sale Price']);
+  data.mortgageBalance=parseMoneyAfter(t,['Mortgage Balance','Loan Balance']);
+  data.estimatedEquity=parseMoneyAfter(t,['Estimated Equity','Equity']);
+  data.monthlyRent=parseMoneyAfter(t,['Monthly Rent','Average Monthly Rent']);
+  data.propertyTax=parseMoneyAfter(t,['Property Tax','Annual Tax','Taxes']);
+  data.beds=parseNumberAfter(t,['Bedrooms','Beds']);
+  data.baths=parseNumberAfter(t,['Bathrooms','Baths']);
+  data.sqft=parseNumberAfter(t,['Square Feet','Living Area','Sq\\.?Ft\\.?']);
+  data.lotSize=parseNumberAfter(t,['Lot Size']);
+  data.yearBuilt=parseNumberAfter(t,['Year Built']);
+  data.daysOnMarket=parseNumberAfter(t,['Days on Market','Average DOM','DOM']);
+  data.compsCount=parseNumberAfter(t,['Comparables Properties','Properties']);
+  data.status = (/Status\s*:?\s*Pending/i.test(t) ? 'Pending' : /Status\s*:?\s*On Market/i.test(t) ? 'On Market' : /Status\s*:?\s*Off Market/i.test(t) ? 'Off Market' : 'Unknown');
+  data.distressed = /Distressed\s*:?\s*Yes|Pre-Foreclosure|Auction/i.test(t) && !/There is no foreclosure data available/i.test(t);
+  data.liens = parseMoneyAfter(t,['Liens']);
+  data.propertyType='unknown';
+  if(/Property Type\s*:?\s*Land|Land Use\s*:?\s*Residential-Vacant Land|Vacant Land|OVERSIZED LOT|\bLot\b/i.test(t)) data.propertyType='land';
+  if(/Property Type\s*:?\s*Single Family|Single Family \(SFR\)|Land Use\s*:?\s*Single Family Residential|Bedrooms\s*:?\s*\d|Bathrooms\s*:?\s*\d|Living Area\s*:?\s*\d/i.test(t)) data.propertyType='sfr';
+  if(/Multifamily|Duplex|Triplex|Fourplex/i.test(t)) data.propertyType='multi';
+  if(/Condo|Townhome|Townhouse/i.test(t)) data.propertyType='condo';
+  data.market=getMarketSignals(raw,data.propertyType,data.sqft);
+
+  if(data.propertyType==='land'){
+    data.underwritingValue=data.market.landCompMedian || data.market.landListingMedian || data.avgSalePrice || data.estimatedValue;
+    data.valueSource=data.market.landCompMedian?'median nearby land sold comps':data.market.landListingMedian?'median nearby active land listings':data.avgSalePrice?'reported average sale price':'reported estimated value';
+    data.suggestedAnalysis='land';
+  }else{
+    const compVals=[data.market.ppsfValue,data.market.saleCompMedian,data.avgSalePrice,data.estimatedValue].filter(n=>n>0);
+    data.underwritingValue=data.market.ppsfValue || data.market.saleCompMedian || data.avgSalePrice || data.estimatedValue;
+    data.valueSource=data.market.ppsfValue?'median sold $/sqft × subject sqft':data.market.saleCompMedian?'median nearby sold comps':data.avgSalePrice?'reported average sale price':'reported estimated value';
+    data.suggestedAnalysis=data.monthlyRent?'rental':(data.mortgageBalance||data.estimatedEquity?'homeowner':'retail');
+    if(data.listingPrice && data.underwritingValue && data.listingPrice > data.underwritingValue*1.08) data.suggestedAnalysis='retail';
+  }
+  if(data.status==='Off Market' && data.propertyType==='land') data.suggestedAnalysis='land';
+  data.equityRatio=safeDiv(data.estimatedEquity,(data.estimatedValue||data.underwritingValue||data.listingPrice));
+  data.confidence=data.propertyType!=='unknown'?(data.address&&(data.underwritingValue||data.estimatedValue||data.listingPrice)?94:82):58;
+  data.redFlags=[]; data.opportunities=[];
+  if(data.listingPrice && data.underwritingValue && data.listingPrice>data.underwritingValue*1.10) data.redFlags.push(`Asking price appears ${money(data.listingPrice-data.underwritingValue)} above the best extracted value source.`);
+  if(data.propertyType==='land' && data.estimatedValue && data.underwritingValue && data.estimatedValue>data.underwritingValue*2) data.redFlags.push('Reported estimated value is much higher than nearby land comps; use land comps as the primary underwriting source.');
+  if(data.monthlyRent && data.listingPrice){const gy=safeDiv(data.monthlyRent*12,data.listingPrice); if(gy<.08)data.redFlags.push(`Gross rent yield is only ${pct(gy)}, which may be weak before expenses and debt service.`); else data.opportunities.push(`Gross rent yield is ${pct(gy)} before expenses.`);}
+  if(data.estimatedEquity && data.estimatedValue){const er=safeDiv(data.estimatedEquity,data.estimatedValue); if(er<.15)data.redFlags.push(`Owner equity appears thin at ${pct(er)}.`); else data.opportunities.push(`Owner equity appears meaningful at ${pct(er)}.`);}
+  if(data.status==='Pending') data.redFlags.push('Listing status is pending; availability may be limited.');
+  if(data.status==='Off Market') data.opportunities.push('Off-market status may create direct-to-owner opportunity if seller motivation exists.');
+  return data;
+}
+function resetAnalyzerFieldsForNewUpload(){
+  ['propertyLabel','listingPrice','purchasePrice','analyzerArv','analyzerRepairs','assignmentFee','closingCosts','holdingCosts','loanBalance','monthlyRent','monthlyExpenses','salePrepCosts','documentNotes'].forEach(id=>{const el=document.getElementById(id); if(el)el.value=''});
+  const a=document.getElementById('analysisType'); if(a)a.value='auto';
+  const p=document.getElementById('propertyType'); if(p)p.value='auto';
+}
+function applyDetectedData(data){
+  resetAnalyzerFieldsForNewUpload();
+  setText('propertyLabel',data.address,true);
+  setVal('listingPrice',data.listingPrice,true);
+  setVal('purchasePrice',data.listingPrice || data.underwritingValue || data.estimatedValue,true);
+  setVal('analyzerArv',data.underwritingValue || data.estimatedValue || data.avgSalePrice,true);
+  setVal('loanBalance',data.mortgageBalance,true);
+  setVal('monthlyRent',data.monthlyRent,true);
+  const taxMonthly=data.propertyTax? data.propertyTax/12 : 0;
+  if(data.monthlyRent) setVal('monthlyExpenses', Math.round(data.monthlyRent*.45 + taxMonthly), true);
+  const p=document.getElementById('propertyType'); if(p && data.propertyType) p.value=data.propertyType;
+  const a=document.getElementById('analysisType'); if(a && data.suggestedAnalysis) a.value=data.suggestedAnalysis;
+  const notes=document.getElementById('documentNotes'); if(notes) notes.dataset.detected=JSON.stringify({valueSource:data.valueSource,market:data.market,redFlags:data.redFlags,opportunities:data.opportunities,status:data.status,estimatedValue:data.estimatedValue,avgSalePrice:data.avgSalePrice,underwritingValue:data.underwritingValue,listingPrice:data.listingPrice,confidence:data.confidence});
+  updateAnalyzerMode();
+  const summary=document.getElementById('extractionSummary');
+  if(summary){
+    summary.classList.remove('hidden-field');
+    const valueLine=data.underwritingValue?`<span>Underwriting Value <strong>${money(data.underwritingValue)}</strong><small>${escapeHtml(data.valueSource||'best extracted source')}</small></span>`:'';
+    summary.innerHTML=`<div class="extract-top"><strong>Detected:</strong> ${escapeHtml(labelProperty(data.propertyType))} · ${escapeHtml(labelAnalysis(data.suggestedAnalysis))} <span class="pill">${data.confidence}% confidence</span></div>
+    <div class="extract-grid">
+      ${data.address?`<span>Address <strong>${escapeHtml(data.address)}</strong></span>`:''}
+      ${valueLine}
+      ${data.estimatedValue?`<span>Reported Est. Value <strong>${money(data.estimatedValue)}</strong></span>`:''}
+      ${data.listingPrice?`<span>List/Asking Price <strong>${money(data.listingPrice)}</strong></span>`:''}
+      ${data.monthlyRent?`<span>Rent <strong>${money(data.monthlyRent)}/mo</strong></span>`:''}
+      ${data.mortgageBalance?`<span>Loan Balance <strong>${money(data.mortgageBalance)}</strong></span>`:''}
+      ${data.estimatedEquity?`<span>Equity <strong>${money(data.estimatedEquity)}</strong></span>`:''}
+    </div>`;
+  }
+}
+function getDetectedMeta(){try{return JSON.parse(document.getElementById('documentNotes')?.dataset.detected||'{}')}catch(e){return {}}}
+function insightBullets(x,best,scores){
+  const meta=getDetectedMeta(); const bullets=[];
+  if(meta.valueSource && x.value) bullets.push(`Primary value source used: ${meta.valueSource}. This matters because CMA estimated values can conflict with actual sold comps.`);
+  if(meta.estimatedValue && meta.underwritingValue && Math.abs(meta.estimatedValue-meta.underwritingValue)>meta.underwritingValue*.25){bullets.push(`Reported estimated value (${money(meta.estimatedValue)}) conflicts with underwriting value (${money(meta.underwritingValue)}). Treat this as a valuation warning, not a clean deal signal.`)}
+  (meta.redFlags||[]).slice(0,3).forEach(f=>bullets.push(f));
+  (meta.opportunities||[]).slice(0,2).forEach(o=>bullets.push(o));
+  if(x.listing && x.value){const gap=x.listing-x.value; if(gap>0)bullets.push(`Price gap: asking/list price is ${money(gap)} above the current underwriting value.`); else bullets.push(`Price gap: asking/list price is ${money(Math.abs(gap))} below the current underwriting value.`)}
+  if(x.propertyType==='land') bullets.push('For land, the best-use checks are buildability, access, utilities, zoning, flood/wetlands, title, HOA restrictions, and recent land-only comps—not house comps.');
+  if(x.rent && (x.listing||x.price)){const rtp=safeDiv(x.rent*12,(x.listing||x.price)); bullets.push(`Gross rent yield is ${pct(rtp)} before expenses, vacancy, financing, repairs, and management.`)}
+  if(best.score<60) bullets.push('Current numbers suggest repricing or passing before spending time on deeper underwriting.');
+  return bullets.slice(0,6);
+}
+function analyzeDealV6(manual=false){
+  const box=document.getElementById('analysisResult'); if(!box)return;
+  const x=getInputs(); const selected=x.analysisType; const meta=getDetectedMeta();
+  const scores=[scoreRetail(x),scoreHomeowner(x),scoreRental(x),scoreFlip(x),scoreWholesale(x),scoreLand(x)];
+  const best=recommendationFromScores(scores, selected==='land'?'land':selected);
+  const sorted=scores.slice().sort((a,b)=>b.score-a.score);
+  const label=labelAnalysis(best.type); const risk=best.risk||baseRisk(best.score);
+  const metrics=best.metrics.map(([k,v])=>`<div class="metric"><span class="muted">${k}</span><strong>${v}</strong></div>`).join('');
+  const compCards=sorted.slice(0,5).map(s=>`<div class="strategy-card ${s.type===best.type?'active':''}"><span>${labelAnalysis(s.type)}</span><strong>${s.score}</strong><small>${s.risk||baseRisk(s.score)} risk</small></div>`).join('');
+  const bullets=insightBullets(x,best,scores).map(b=>`<li>${escapeHtml(b)}</li>`).join('');
+  const steps=nextSteps(x,best).map(s=>`<li>${escapeHtml(s)}</li>`).join('');
+  const action=best.score>=80?'Worth Deeper Underwriting':best.score>=65?'Proceed Carefully':best.score>=50?'Renegotiate / Verify First':'Likely Pass Unless Repriced';
+  const sourceNote=meta.valueSource?`<p class="source-note"><strong>Valuation source:</strong> ${escapeHtml(meta.valueSource)}${meta.confidence?` · ${meta.confidence}% extraction confidence`:''}</p>`:'';
+  box.innerHTML=`
+    <div class="report-header">
+      <div><p class="eyebrow">Deal Brief V7</p><h2>${escapeHtml(x.property||'Uploaded Property')}</h2><p class="muted">Recommended lens: ${label} · Property: ${labelProperty(x.propertyType)}</p>${sourceNote}</div>
+      <div class="score-badge"><strong>${best.score}</strong><span>/100</span></div>
+    </div>
+    <div class="verdict ${best.score>=75?'good':best.score>=55?'watch':'bad'}"><strong>${action}</strong><span>${escapeHtml(best.headline)}</span></div>
+    <div class="metric-grid">${metrics}</div>
+    <h3>Strategy Comparison</h3><div class="strategy-grid">${compCards}</div>
+    <h3>Information worth knowing</h3><ul class="small-list">${bullets}</ul>
+    <h3>Next checks</h3><ol class="small-list">${steps}</ol>
+    <p class="muted tiny-note">Educational estimate only. Values are extracted from the uploaded document and should be verified against public records, sold comps, inspection, title, financing, and local market review.</p>
+    <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Print / Save Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
+  trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:risk,manual:manual,value_source:meta.valueSource||''});
+}
+async function handleDealPdfUpload(event){
+  const file=event.target.files?.[0]; const status=document.getElementById('pdfStatus'); const notes=document.getElementById('documentNotes'); const result=document.getElementById('analysisResult');
+  if(!file)return;
+  resetAnalyzerFieldsForNewUpload();
+  const summary=document.getElementById('extractionSummary'); if(summary){summary.innerHTML=''; summary.classList.add('hidden-field');}
+  if(status)status.textContent='Reading PDF and starting analysis...';
+  if(result) result.innerHTML='<div class="loading-state"><div class="loader"></div><h3>Analyzing new document...</h3><p class="muted">Extracting the useful underwriting signals, not just repeating the PDF.</p></div>';
+  try{
+    if(!window.pdfjsLib){ if(status)status.textContent='PDF reader did not load. Paste the deal details manually.'; return; }
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const buf=await file.arrayBuffer(); const pdf=await pdfjsLib.getDocument({data:buf}).promise; let out='';
+    for(let i=1;i<=Math.min(pdf.numPages,18);i++){const page=await pdf.getPage(i); const content=await page.getTextContent(); out+=content.items.map(item=>item.str).join(' ')+'\n\n';}
+    const data=detectFromText(out); applyDetectedData(data);
+    if(notes)notes.value=out.slice(0,25000);
+    if(status)status.textContent=`Analyzed: ${file.name}. Upload another file anytime; the prior analysis will be replaced.`;
+    analyzeDealV6(false);
+    trackEvent('deal_pdf_uploaded',{pages:pdf.numPages,property_type:data.propertyType,suggested_analysis:data.suggestedAnalysis,value_source:data.valueSource});
+  }catch(err){console.error(err); if(status)status.textContent='Could not read this PDF. It may be scanned/protected. Paste the key numbers manually.'; if(result)result.innerHTML='<h3>Could not analyze this PDF.</h3><p class="muted">Try another PDF or paste the property details into the notes field.</p>'; trackEvent('deal_pdf_upload_failed',{});}
+  finally{ if(event && event.target) event.target.value=''; }
+}

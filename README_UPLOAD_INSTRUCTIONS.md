@@ -1,34 +1,71 @@
-# DealCalc Full Update V6
+# DealCalc.io Full Update V9 — Accounts + Saved Deals
 
-## What changed
+Upload/replace the full contents of this folder into your GitHub repository root, then commit and push.
 
-V6 focuses on making the AI Deal Analyzer more presentable and more useful.
+## What V9 Adds
 
-### Key improvements
+- Login / Create Account page: `/auth.html`
+- Dashboard page: `/dashboard.html`
+- Supabase configuration file: `/assets/js/supabase-config.js`
+- Supabase authentication logic: `/assets/js/auth.js`
+- Save Deal button in AI Deal Analyzer results
+- Saved deal history in Dashboard
+- Local browser fallback if Supabase is not configured yet
+- Contact page email link: `info@dealcalc.io`
+- Contact reason dropdown
+- Footer email link across pages
 
-- PDF upload is now the first step.
-- Analysis starts automatically after upload.
-- The analyzer no longer dumps a wall of extracted text as the main output.
-- Results are displayed as a concise investor-style deal brief.
-- Strategy comparison is shown in score cards.
-- Output includes:
-  - Deal Score
-  - Best-fit strategy
-  - Key financial metrics
-  - What the numbers mean
-  - Next diligence checks
-- Extracted PDF details are summarized separately.
-- Raw extracted text is hidden inside an optional details section.
-- Manual input edits auto-refresh the analysis after a short delay.
+## Important Supabase Setup
 
-## Files to replace
+1. Create a free Supabase project.
+2. Go to Project Settings → API.
+3. Copy:
+   - Project URL
+   - anon public key
+4. Open:
 
-Upload the full folder contents to your GitHub repository root and replace existing files.
+```text
+assets/js/supabase-config.js
+```
 
-Most important files:
+5. Replace:
 
-- `tools/ai-deal-analyzer.html`
-- `assets/js/main.js`
-- `assets/css/styles.css`
+```text
+REPLACE_WITH_SUPABASE_PROJECT_URL
+REPLACE_WITH_SUPABASE_ANON_PUBLIC_KEY
+```
 
-Then commit and push. Vercel should redeploy automatically.
+6. In Supabase SQL Editor, run:
+
+```text
+SUPABASE_SETUP.sql
+```
+
+7. In Supabase Auth settings, add these redirect URLs:
+
+```text
+https://www.dealcalc.io/dashboard.html
+https://dealcalc.io/dashboard.html
+http://localhost:3000/dashboard.html
+```
+
+8. Optional: enable Google provider in Supabase Auth Providers.
+
+## Files to Confirm After Upload
+
+```text
+auth.html
+dashboard.html
+assets/js/auth.js
+assets/js/supabase-config.js
+SUPABASE_SETUP.sql
+tools/ai-deal-analyzer.html
+assets/js/main.js
+assets/css/styles.css
+contact.html
+sitemap.xml
+```
+
+## How It Works Before Supabase Is Configured
+
+If Supabase is not configured yet, users can still click Save Deal and the deal will save locally in their browser. Once Supabase is configured and users log in, deals save to the cloud.

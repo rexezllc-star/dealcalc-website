@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DEALCALC V6 ANALYZER: Upload-first, auto-runs after PDF extraction, concise investor report output. -->
+<!-- DEALCALC V7 ANALYZER: repeat uploads, source-aware CMA underwriting, concise insight report. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -28,9 +28,9 @@
 </header>
 <main>
   <section class="hero analyzer-hero">
-    <p class="eyebrow">AI Deal Analyzer V6</p>
+    <p class="eyebrow">AI Deal Analyzer V7</p>
     <h1>Upload a property PDF. DealCalc starts the analysis automatically.</h1>
-    <p>Built for CMAs, MLS sheets, seller packets, Zillow-style flyers, land packets, and offering memorandums. DealCalc extracts the important numbers, detects the property type, compares strategies, and gives a concise investor-style recommendation.</p>
+    <p>Built for CMAs, MLS sheets, seller packets, Zillow-style flyers, land packets, and offering memorandums. DealCalc extracts the important numbers, detects the property type, selects the best valuation source, compares strategies, and summarizes what is actually worth knowing.</p>
   </section>
 
   <section class="section analyzer-layout">
@@ -41,7 +41,7 @@
       <label class="drop-zone" for="dealPdf">
         <span class="drop-icon">↑</span>
         <strong>Choose PDF to analyze</strong>
-        <small>Analysis starts automatically after upload</small>
+        <small>Analysis starts automatically after each upload</small>
       </label>
       <input id="dealPdf" class="visually-hidden" type="file" accept="application/pdf" onchange="handleDealPdfUpload(event)">
       <p id="pdfStatus" class="muted status-line">No PDF uploaded yet.</p>
@@ -51,7 +51,7 @@
     <div class="card compact-input-card">
       <div class="step-label">Step 2</div>
       <h2>Review / Override</h2>
-      <p class="muted">DealCalc will fill what it recognizes. You can adjust the goal or numbers and the result updates automatically.</p>
+      <p class="muted">DealCalc will fill what it recognizes, replace old uploads cleanly, and use the best available value source instead of blindly trusting one number.</p>
       <div class="form-grid compact-form">
         <div>
           <label>Property Type</label>
@@ -100,7 +100,7 @@
       <div class="empty-state">
         <p class="eyebrow">Ready</p>
         <h3>Upload a PDF and DealCalc will start automatically.</h3>
-        <p class="muted">The result will be a clean deal brief, not a wall of extracted text.</p>
+        <p class="muted">The result will be a clean deal brief with value-source notes, risks, and next checks.</p>
       </div>
     </aside>
   </section>
@@ -113,8 +113,12 @@
 </main>
 <footer class="site-footer">
   <div><strong>DealCalc.io</strong><p>Real estate deal analysis tools for wholesalers, land investors, flippers, homeowners, and buy-and-hold investors.</p></div>
-  <div><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a></div>
+  <div><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a><a href="mailto:info@dealcalc.io">info@dealcalc.io</a></div>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="/assets/js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase-config.js"></script>
+<script src="/assets/js/auth.js"></script>
 </body></html>
