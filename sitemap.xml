@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://dealcalc.io/</loc></url>
-<url><loc>https://dealcalc.io/calculator/mao-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/arv-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/assignment-fee-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/double-close-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/land-flip-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/rehab-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/roi-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/cash-flow-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/cap-rate-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/calculator/wholesale-deal-calculator.html</loc></url>
-<url><loc>https://dealcalc.io/tools/ai-deal-analyzer.html</loc></url>
-<url><loc>https://dealcalc.io/learn/</loc></url>
-<url><loc>https://dealcalc.io/articles/what-is-arv.html</loc></url>
-<url><loc>https://dealcalc.io/articles/what-is-mao.html</loc></url>
-<url><loc>https://dealcalc.io/articles/wholesale-real-estate-explained.html</loc></url>
-<url><loc>https://dealcalc.io/articles/cash-buyer-guide.html</loc></url>
-<url><loc>https://dealcalc.io/articles/wholesale-mistakes-to-avoid.html</loc></url>
-<url><loc>https://dealcalc.io/articles/tax-delinquent-land-guide.html</loc></url>
-<url><loc>https://dealcalc.io/articles/due-diligence-checklist.html</loc></url>
-<url><loc>https://dealcalc.io/articles/assignment-contract-guide.html</loc></url>
-<url><loc>https://dealcalc.io/articles/vacant-land-investing.html</loc></url>
-<url><loc>https://dealcalc.io/articles/repair-cost-estimate-guide.html</loc></url>
-<url><loc>https://dealcalc.io/about.html</loc></url>
-<url><loc>https://dealcalc.io/contact.html</loc></url>
-<url><loc>https://dealcalc.io/privacy.html</loc></url>
-<url><loc>https://dealcalc.io/terms.html</loc></url>
-<url><loc>https://dealcalc.io/disclaimer.html</loc></url>
-<url><loc>https://dealcalc.io/affiliate-disclosure.html</loc></url>
+  <url><loc>https://dealcalc.io/</loc></url>
+  <url><loc>https://dealcalc.io/calculators.html</loc></url>
+  <url><loc>https://dealcalc.io/learn/</loc></url>
+  <url><loc>https://dealcalc.io/learn.html</loc></url>
+  <url><loc>https://dealcalc.io/tools/ai-deal-analyzer.html</loc></url>
+  <url><loc>https://dealcalc.io/about.html</loc></url>
+  <url><loc>https://dealcalc.io/contact.html</loc></url>
+  <url><loc>https://dealcalc.io/privacy.html</loc></url>
+  <url><loc>https://dealcalc.io/terms.html</loc></url>
+  <url><loc>https://dealcalc.io/disclaimer.html</loc></url>
+  <url><loc>https://dealcalc.io/affiliate-disclosure.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/mao-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/arv-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/assignment-fee-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/double-close-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/land-flip-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/rehab-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/roi-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/cash-flow-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/cap-rate-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/calculator/wholesale-deal-calculator.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/what-is-arv.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/what-is-mao.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/wholesale-real-estate-explained.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/cash-buyer-guide.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/wholesale-mistakes-to-avoid.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/tax-delinquent-land-guide.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/due-diligence-checklist.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/assignment-contract-guide.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/vacant-land-investing.html</loc></url>
+  <url><loc>https://dealcalc.io/articles/repair-cost-estimate-guide.html</loc></url>
 </urlset>

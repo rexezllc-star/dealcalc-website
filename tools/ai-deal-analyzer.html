@@ -4,33 +4,121 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Deal Analyzer | DealCalc.io</title>
-  <meta name="description" content="Score a wholesale, flip, or land investment deal using purchase price, ARV, repairs, fees, and holding costs.">
+  <meta name="description" content="Analyze wholesale, fix and flip, rental, vacant land, and homeowner equity scenarios using profit, equity, MAO, risk, and deal score metrics.">
   <link rel="canonical" href="https://dealcalc.io/tools/ai-deal-analyzer.html">
   <meta property="og:title" content="AI Deal Analyzer | DealCalc.io">
-  <meta property="og:description" content="Score a wholesale, flip, or land investment deal using purchase price, ARV, repairs, fees, and holding costs.">
+  <meta property="og:description" content="Score wholesale, flip, rental, land, and homeowner equity scenarios with transparent deal-analysis logic.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://dealcalc.io/tools/ai-deal-analyzer.html">
   <link rel="stylesheet" href="/assets/css/styles.css">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LVWBTX8RQB"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-LVWBTX8RQB');</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"DealCalc","url":"https://dealcalc.io","potentialAction":{"@type":"SearchAction","target":"https://dealcalc.io/learn/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
-  
 </head>
 <body>
 <header class="site-header">
   <a class="brand" href="/">DealCalc<span>.io</span></a>
   <nav>
-    <a href="/calculator/mao-calculator.html">Calculators</a>
+    <a href="/calculators.html">Calculators</a>
     <a href="/tools/ai-deal-analyzer.html">AI Analyzer</a>
     <a href="/learn/">Learn</a>
     <a href="/about.html">About</a>
     <a href="/contact.html">Contact</a>
   </nav>
 </header>
-<main><section class="hero"><p class="eyebrow">AI Deal Analyzer V1</p><h1>Score your deal before you make the offer.</h1><p>Enter the core deal numbers and DealCalc will return a deal score, risk level, MAO, estimated profit, and recommendation.</p></section><section class="section tool"><div class="card"><h2>Deal Inputs</h2><div class="form-grid"><div><label>Purchase Price</label><input id="purchasePrice" type="number" placeholder="110000"></div><div><label>ARV / Resale Value</label><input id="analyzerArv" type="number" placeholder="250000"></div><div><label>Repair Costs</label><input id="analyzerRepairs" type="number" placeholder="45000"></div><div><label>Assignment Fee</label><input id="assignmentFee" type="number" placeholder="15000"></div><div><label>Closing Costs</label><input id="closingCosts" type="number" placeholder="4000"></div><div><label>Holding Costs</label><input id="holdingCosts" type="number" placeholder="3000"></div></div><p><button class="btn" onclick="analyzeDeal()">Analyze Deal</button></p></div><aside class="result-box" id="analysisResult"><h3>Deal score will appear here.</h3><p class="muted">This V1 uses transparent rules. Later, this can be connected to OpenAI API, saved deals, and comp uploads.</p></aside></section><section class="section grid two"><div class="card"><h2>What the score means</h2><p><span class="pill">80-100 Strong</span><span class="pill">65-79 Workable</span><span class="pill">50-64 Borderline</span><span class="pill">0-49 Pass</span></p></div><div class="card"><h2>Next version</h2><p class="muted">Add saved deals, PDF export, user accounts, and actual AI commentary using the OpenAI API.</p></div></section></main>
+<main>
+  <section class="hero">
+    <p class="eyebrow">Multi-Strategy Deal Analyzer V2</p>
+    <h1>Analyze wholesale deals, flips, rentals, land, and homeowner equity.</h1>
+    <p>Choose your strategy, enter the numbers, or upload a PDF. DealCalc estimates profit, equity, risk, MAO, and the next best action.</p>
+  </section>
+
+  <section class="section tool wide-tool">
+    <div class="card">
+      <h2>Deal Inputs</h2>
+      <div class="form-grid">
+        <div>
+          <label>Analysis Type</label>
+          <select id="analysisType" onchange="updateAnalyzerMode()">
+            <option value="wholesale">Wholesale Assignment</option>
+            <option value="flip">Fix & Flip</option>
+            <option value="rental">Rental / Buy & Hold</option>
+            <option value="land">Vacant Land Flip</option>
+            <option value="homeowner">Homeowner Equity</option>
+          </select>
+        </div>
+        <div>
+          <label>Property Address / Label</label>
+          <input id="propertyLabel" placeholder="123 Main St or Deal A">
+        </div>
+        <div>
+          <label>Purchase Price / Current Value</label>
+          <input id="purchasePrice" type="number" placeholder="110000">
+        </div>
+        <div>
+          <label>ARV / Resale Value</label>
+          <input id="analyzerArv" type="number" placeholder="250000">
+        </div>
+        <div>
+          <label>Repair / Improvement Costs</label>
+          <input id="analyzerRepairs" type="number" placeholder="45000">
+        </div>
+        <div>
+          <label>Assignment Fee / Desired Profit</label>
+          <input id="assignmentFee" type="number" placeholder="15000">
+        </div>
+        <div>
+          <label>Closing / Selling Costs</label>
+          <input id="closingCosts" type="number" placeholder="4000">
+        </div>
+        <div>
+          <label>Holding / Financing Costs</label>
+          <input id="holdingCosts" type="number" placeholder="3000">
+        </div>
+        <div class="mode rental-mode homeowner-mode hidden-field">
+          <label>Mortgage / Loan Balance</label>
+          <input id="loanBalance" type="number" placeholder="185000">
+        </div>
+        <div class="mode rental-mode hidden-field">
+          <label>Monthly Rent</label>
+          <input id="monthlyRent" type="number" placeholder="2200">
+        </div>
+        <div class="mode rental-mode hidden-field">
+          <label>Monthly Expenses</label>
+          <input id="monthlyExpenses" type="number" placeholder="1450">
+        </div>
+        <div class="mode homeowner-mode hidden-field">
+          <label>Estimated Sale Prep Costs</label>
+          <input id="salePrepCosts" type="number" placeholder="5000">
+        </div>
+      </div>
+
+      <div class="upload-panel">
+        <h3>Optional PDF Upload</h3>
+        <p class="muted">Upload a property flyer, MLS printout, seller packet, or deal sheet. DealCalc will read the text in your browser and try to prefill numbers it recognizes.</p>
+        <input id="dealPdf" type="file" accept="application/pdf" onchange="handleDealPdfUpload(event)">
+        <p id="pdfStatus" class="muted">No PDF uploaded yet.</p>
+        <textarea id="documentNotes" placeholder="Extracted PDF text or notes will appear here. You can also paste listing details, seller notes, rent estimates, tax notes, or repair notes."></textarea>
+      </div>
+
+      <p class="cta-row"><button class="btn" onclick="analyzeDealV2()">Analyze Deal</button><button class="btn secondary" onclick="clearAnalyzer()" type="button">Clear</button></p>
+    </div>
+
+    <aside class="result-box" id="analysisResult">
+      <h3>Deal analysis will appear here.</h3>
+      <p class="muted">This version supports multiple user types: wholesalers, flippers, rental investors, land investors, and homeowners estimating equity.</p>
+    </aside>
+  </section>
+
+  <section class="section grid three-info">
+    <div class="card"><h2>For Investors</h2><p class="muted">Estimate MAO, spread, flip profit, rental cash flow, and land resale upside.</p></div>
+    <div class="card"><h2>For Homeowners</h2><p class="muted">Estimate current equity, sale proceeds, and whether selling or refinancing may make sense.</p></div>
+    <div class="card"><h2>For PDFs</h2><p class="muted">Client-side PDF extraction works best with text-based PDFs. Scanned image PDFs may need manual entry.</p></div>
+  </section>
+</main>
 <footer class="site-footer">
-  <div><strong>DealCalc.io</strong><p>Real estate deal analysis tools for wholesalers, land investors, flippers, and buy-and-hold investors.</p></div>
+  <div><strong>DealCalc.io</strong><p>Real estate deal analysis tools for wholesalers, land investors, flippers, homeowners, and buy-and-hold investors.</p></div>
   <div><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a></div>
 </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="/assets/js/main.js"></script>
 </body></html>
