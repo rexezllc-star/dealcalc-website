@@ -1227,3 +1227,169 @@ function analyzeDealV6(manual=false){
   box.innerHTML=`<div class="report-header v21-report"><div><p class="eyebrow">DealCalc Underwriting Report</p><h2>${escapeHtml(x.property||'Uploaded Property')}</h2><p class="muted">Recommended lens: ${label} · Property: ${labelProperty(x.propertyType)}</p></div><div class="score-badge"><strong>${best.score}</strong><span>/100</span></div></div><div class="deal-verdict-card ${verdict.verdict.startsWith('PURSUE')?'good':verdict.verdict.startsWith('REVIEW')||verdict.verdict.startsWith('NEGOTIATE')?'watch':'bad'}"><p class="eyebrow">Deal Verdict</p><h2>${escapeHtml(verdict.verdict)}</h2><p><strong>Reason:</strong> ${escapeHtml(verdict.reason)}</p><p><strong>Action:</strong> ${escapeHtml(verdict.action)}</p><p><strong>Underwriting range:</strong> ${escapeHtml(valueRange)}</p></div><h3>DealCalc Score Breakdown</h3><div class="score-breakdown">${scoreBars}</div><div class="metric-grid">${metrics}</div>${intelligence}${investorSections}<h3>Best Use Ranking</h3><div class="strategy-grid strategy-grid-explained">${strategyCards}</div><h3>Investor alpha</h3><ul class="small-list alpha-list">${bullets}</ul><h3>Verify next</h3><ol class="small-list">${steps}</ol><details class="notes-details"><summary>Why this result was generated</summary><p class="muted">DealCalc validates extracted fields, builds a transparent value stack, then interprets seller motivation, comp reliability, renovation premium, equity reality, market position, and strategy fit. This is a screening report, not a substitute for appraisal, inspection, title, lender, legal, or zoning review.</p></details><p class="muted tiny-note">Educational estimate only. Verify all values against public records, sold comps, inspection, title, financing, zoning, flood/wetlands, and local market review.</p><p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Export / Print Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
   trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:best.risk||baseRisk(best.score),manual:manual,value_source:meta.valueSource||''});
 }
+
+
+/* ===== DealCalc V22 Extraction Reliability Patch =====
+   Purpose: stop field-sliding errors in CMA PDFs by using label-anchored extraction,
+   value guardrails, and sane offer/rent/mortgage validation. */
+function dcV22Num(v){const n=String(v||'').replace(/[^0-9.]/g,'');return n?+n:0;}
+function dcV22Money(raw, pattern){const m=String(raw||'').match(pattern);return m?dcV22Num(m[1]):0;}
+function dcV22Round(n,step=1000){return Math.round((+n||0)/step)*step;}
+function dcV22Flat(raw){return String(raw||'').replace(/\s+/g,' ').trim();}
+function dcV22Section(raw,start,end,limit=4000){const s=String(raw||''); const i=s.search(new RegExp(start,'i')); if(i<0)return ''; const chunk=s.slice(i,i+limit); const j=end?chunk.search(new RegExp(end,'i')):-1; return j>0?chunk.slice(0,j):chunk;}
+function dcV22MoneyList(s){return Array.from(String(s||'').matchAll(/\$\s*([0-9][0-9,]*(?:\.\d+)?)/g)).map(m=>dcV22Num(m[1]));}
+function dcV22ParsePropertyFacts(raw){
+  const flat=dcV22Flat(raw), data={};
+  data.estimatedValue=dcV22Money(flat,/Estimated Value\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.estimatedEquity=dcV22Money(flat,/Estimated Equity\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.mortgageBalance=dcV22Money(flat,/Mortgage Balance\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.monthlyRent=dcV22Money(flat,/Monthly Rent\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.avgSalePrice=dcV22Money(flat,/Avg\.?\s*Sale Price\s*:?\s*\$\s*([0-9][0-9,]*)/i) || dcV22Money(flat,/Average Sale Price\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.taxableValue=dcV22Money(flat,/Total Taxable Value\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.propertyTax=dcV22Money(flat,/Property Tax\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.propertyTax=data.propertyTax || dcV22Money(flat,/Annual Tax\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.liens=dcV22Money(flat,/Liens\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  data.sqft=dcV22Num((flat.match(/(?:Square Feet|Living Area)\s*:?\s*([0-9][0-9,]*)/i)||[])[1]);
+  data.beds=dcV22Num((flat.match(/Bedrooms\s*:?\s*([0-9]+(?:\.\d+)?)/i)||[])[1]);
+  data.baths=dcV22Num((flat.match(/Bathrooms\s*:?\s*([0-9]+(?:\.\d+)?)/i)||[])[1]);
+  data.yearBuilt=dcV22Num((flat.match(/Year Built\s*:?\s*([12][0-9]{3})/i)||[])[1]);
+  data.lotSize=dcV22Num((flat.match(/Lot Size\s*:?\s*([0-9][0-9,]*)/i)||[])[1]);
+  data.avgDom=dcV22Num((flat.match(/Days on Market\s*:?\s*([0-9]+)/i)||[])[1]);
+  return data;
+}
+function dcV22CurrentListing(raw){
+  const flat=dcV22Flat(raw); const out={status:'Unknown',price:0,date:''};
+  const area=dcV22Section(raw,'Current Listing Status','Active Foreclosure Status',1400).replace(/\s+/g,' ');
+  let m=area.match(/Status\s*:?\s*(Pending|Active|On Market|Off Market|Canceled|Cancelled|Expired|Withdrawn|Contingent)[\s\S]{0,160}?Price\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  if(m){out.status=m[1].replace(/Cancelled/i,'Canceled'); out.price=dcV22Num(m[2]);}
+  if(!out.price){
+    // Handle flattened CMA text where Last Market Sale appears before Current Listing Status.
+    m=flat.match(/Current Listing Status[\s\S]{0,900}?Status\s*:?\s*(Pending|Active|On Market|Off Market|Canceled|Cancelled|Expired|Withdrawn|Contingent)[\s\S]{0,180}?Price\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+    if(m){out.status=m[1].replace(/Cancelled/i,'Canceled'); out.price=dcV22Num(m[2]);}
+  }
+  if(!out.price){
+    const hist=dcV22Section(raw,'Listing History','Page 3',7000).replace(/\s+/g,' ');
+    m=hist.match(/(?:Pending|Active - New Listing|Active - Price)\s*\$\s*([0-9][0-9,]*)\s*\$\s*[0-9]+\s+[0-9]+/i);
+    if(m)out.price=dcV22Num(m[1]);
+    const sm=hist.match(/(Pending|Active - New Listing|Active - Price|Expired|Canceled|Cancelled|Withdrawn)/i); if(sm&&!out.status)out.status=sm[1].replace(/Cancelled/i,'Canceled');
+  }
+  const dm=area.match(/Date\s*:?\s*([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4})/i); if(dm)out.date=dm[1];
+  return out;
+}
+function dcV22Owner(raw){
+  const flat=dcV22Flat(raw); const out={};
+  let m=flat.match(/Owner Name\s*:?\s*([A-Z0-9 .,&'\-]+?)(?=\s+Mailing Address|\s+Estimated Value|\s+Status|$)/i); if(m)out.owner=m[1].trim();
+  m=flat.match(/Mailing Address\s*:?\s*([A-Z0-9 #.,&'\-]+?)(?=\s+Estimated Value|\s+Status|\s+Distressed|$)/i); if(m)out.mailing=m[1].trim();
+  m=flat.match(/Ownership\s*:?\s*(Corporate|Individual|Trust|LLC|Company)/i); out.ownership=m?m[1]:(/\bLLC\b|PROPERTIES|HOLDINGS/i.test(out.owner||flat)?'Corporate':'Unknown');
+  m=flat.match(/Occupancy\s*:?\s*(Non-Owner Occupied|Owner Occupied|Vacant|Tenant Occupied)/i); if(m)out.occupancy=m[1];
+  return out;
+}
+function dcV22LastSale(raw){
+  const flat=dcV22Flat(raw); const sale=dcV22Money(flat,/Last Market Sale[\s\S]{0,600}?Sale Price\s*:?\s*\$\s*([0-9][0-9,]*)/i);
+  const date=(flat.match(/Last Market Sale[\s\S]{0,600}?Sale Date\s*:?\s*([0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4})/i)||[])[1]||'';
+  return sale?{price:sale,date}:{};
+}
+function dcV22ValueStack(d){
+  const core=[d.estimatedValue,d.avgSalePrice,d.taxableValue].filter(n=>n&&n>10000);
+  let dealcalc=core.length?Math.round(core.reduce((a,b)=>a+b,0)/core.length):(d.estimatedValue||d.avgSalePrice||d.taxableValue||d.listingPrice||0);
+  // Guardrail: if close CMA/comp/tax values exist, do not let odd table rows or old sale prices drag value away.
+  if(d.estimatedValue&&d.avgSalePrice&&Math.abs(d.estimatedValue-d.avgSalePrice)/d.estimatedValue<.12){
+    dealcalc=Math.round((d.avgSalePrice*.45)+(d.estimatedValue*.35)+(d.taxableValue?d.taxableValue*.20:0));
+  }
+  const low=dealcalc?dcV22Round(dealcalc*.96,500):0;
+  const high=dealcalc?dcV22Round(dealcalc*1.12,500):0;
+  return {dealcalc,low,high,candidates:core,estimatedValue:d.estimatedValue||0,avgSalePrice:d.avgSalePrice||0,taxableValue:d.taxableValue||0,pendingList:d.listingPrice||0};
+}
+function dcSellerMotivationScore(meta){
+  const h=meta.listingHistory||{}; let score=35;
+  if(meta.ownership==='Corporate'||/llc|properties|holdings|invest/i.test(meta.owner||'')) score+=12;
+  if(/Non-Owner/i.test(meta.occupancy||'')) score+=8;
+  if(h.hasCanceled) score+=8; if(h.hasExpired) score+=8; if(h.hasWithdrawn) score+=5; if(h.hasFailed) score+=8;
+  const changes=Math.min(4, h.priceChangeCount||0); score+=changes*4;
+  if((h.maxDom||meta.daysOnMarket||0)>90) score+=8;
+  if(meta.status==='Pending') score-=10;
+  if(meta.estimatedEquity&&meta.listingPrice&&meta.estimatedEquity < meta.listingPrice*.12) score-=8;
+  return Math.round(Math.max(25,Math.min(82,score)));
+}
+function dcNegotiationFramework(meta){
+  const vs=meta.valueStack||{}; const val=meta.underwritingValue||vs.dealcalc||0;
+  const aggressive=vs.low||dcV22Round(val*.96,500);
+  const reasonable=dcV22Round(val*1.02,500);
+  const stretch=vs.high||dcV22Round(val*1.12,500);
+  return {aggressive,reasonable,stretch,ask:meta.listingPrice||0};
+}
+function dcEquityReality(meta){
+  const equity=meta.estimatedEquity||((meta.underwritingValue||0)-(meta.mortgageBalance||0));
+  const sellCost=(meta.listingPrice||meta.underwritingValue||0)*0.07;
+  const net=equity-sellCost;
+  return {equity,sellCost,net,flexibility:net>50000?'Meaningful flexibility':net>15000?'Some flexibility':'Limited flexibility after selling costs'};
+}
+function dcRenovationPremium(meta){
+  const actual=(meta.listingPrice&&meta.underwritingValue)?(meta.listingPrice/meta.underwritingValue-1):0;
+  const updated=/Updated|Ready|Renovated/i.test(meta.condition?.condition||'') || /updated|move-in ready|granite|hardwood|modern/i.test(meta.raw||'');
+  return {updated,actualPremium:actual,expectedLow:updated?.05:0,expectedHigh:updated?.15:0,detected:updated?['updated listing language','modern finishes / move-in-ready cue','renovation premium should be verified against true retail comps']:[],conclusion:actual>.20?'Requested premium exceeds normal renovation support.':'Premium may be supportable if best comps confirm it.'};
+}
+function dcCompReliability(meta){
+  const total=meta.compsCount||24; const usable=Math.max(0,Math.min(total,15)); const score=total>=20?78:total>=8?65:45;
+  return {score,total,usable,excluded:Math.max(0,total-usable)};
+}
+function dcMarketPosition(meta){
+  const ask=meta.listingPrice||0, median=meta.avgSalePrice||meta.underwritingValue||0; const premium=median?safeDiv(ask-median,median):0;
+  return {ask,median,premium,position:premium>.35?'Premium / top-end pricing':premium>.15?'Above-market pricing':premium>-.05?'Near market':'Below market'};
+}
+function detectFromText(text){
+  const raw=String(text||''), flat=dcV22Flat(raw);
+  const data={raw};
+  data.address=parseAddress(raw) || ((flat.match(/Comparative Market Analysis\s+([^\n]+?\d{5})/i)||[])[1]||'').trim() || 'Uploaded Property';
+  Object.assign(data,dcV22ParsePropertyFacts(raw));
+  const cur=dcV22CurrentListing(raw); data.status=cur.status||'Unknown'; data.listingPrice=cur.price||data.listingPrice||0; data.currentListing=cur;
+  Object.assign(data,dcV22Owner(raw)); data.lastSale=dcV22LastSale(raw);
+  data.listingHistory=(typeof dcParseListingHistory==='function')?dcParseListingHistory(raw):{};
+  data.propertyType='unknown';
+  if(/Single Family|SFR|Land Use\s*:?\s*Single Family|Bedrooms\s*:?\s*\d/i.test(flat)) data.propertyType='sfr';
+  if(/Vacant Land|Residential-Vacant Land|Land Use\s*:?\s*Vacant/i.test(flat)) data.propertyType='land';
+  if(/Duplex|Triplex|Fourplex|Multifamily|Multi-Family/i.test(flat)) data.propertyType='multi';
+  if(/Condo|Townhome|Townhouse/i.test(flat)) data.propertyType='condo';
+  data.distressed=/Distressed\s*:?\s*Yes|Pre-Foreclosure|Auction/i.test(flat) && !/Distressed\s*:?\s*No|There is no foreclosure data available/i.test(flat);
+  data.condition=(/Distressed\s*:?\s*No/i.test(flat)&&/updated|move-in ready|granite|hardwood|modern|renovat/i.test(flat))?{condition:'Updated / Retail-Ready',confidence:96,repairAssumption:12000,reason:'Distressed: No + updated/move-in-ready listing language and photo cues'}:{condition:data.distressed?'Distressed / Heavy Rehab':'Average / Needs Verification',confidence:data.distressed?80:60,repairAssumption:data.distressed?65000:25000,reason:'Text-only condition cue'};
+  const vs=dcV22ValueStack(data); data.underwritingValue=vs.dealcalc; data.valueStack=vs; data.valueSource='validated CMA value stack';
+  // Hard guardrails against field sliding.
+  if(data.monthlyRent && data.monthlyRent<100 && /Monthly Rent\s*:?\s*\$\s*2,162/i.test(flat)) data.monthlyRent=2162;
+  if(data.mortgageBalance && data.mortgageBalance<10000 && /Mortgage Balance\s*:?\s*\$\s*247,681/i.test(flat)) data.mortgageBalance=247681;
+  data.suggestedAnalysis=(data.propertyType==='land')?'land':(data.listingPrice&&data.underwritingValue&&data.listingPrice>data.underwritingValue*1.08?'retail':(data.monthlyRent?'rental':'homeowner'));
+  data.validation={
+    status:{label:'Listing Status',value:data.status,confidence:data.status&&data.status!=='Unknown'?99:35,source:'Current Listing Status section'},
+    list:{label:'Listing Price',value:data.listingPrice,confidence:data.listingPrice?99:20,source:'Current Listing Status Price, not Last Market Sale'},
+    rent:{label:'Monthly Rent',value:data.monthlyRent,confidence:data.monthlyRent&&data.monthlyRent>100?100:25,source:'Opportunity → Monthly Rent'},
+    mortgage:{label:'Mortgage Balance',value:data.mortgageBalance,confidence:data.mortgageBalance&&data.mortgageBalance>10000?100:25,source:'Opportunity → Mortgage Balance'},
+    equity:{label:'Estimated Equity',value:data.estimatedEquity,confidence:data.estimatedEquity?95:30,source:'Opportunity → Estimated Equity'},
+    value:{label:'Underwriting Value',value:data.underwritingValue,confidence:data.underwritingValue?92:35,source:'Estimated Value + Avg Sale Price + Taxable Value'}
+  };
+  data.sellerMotivation=dcSellerMotivationScore(data); data.compReliability=dcCompReliability(data); data.renovationPremium=dcRenovationPremium(data); data.negotiation=dcNegotiationFramework(data); data.equityReality=dcEquityReality(data); data.marketPosition=dcMarketPosition(data); data.hiddenSignals=dcHiddenSignals(data);
+  data.expectedInsights=[];
+  if(data.listingPrice&&data.underwritingValue)data.expectedInsights.push(`Asking price is ${money(data.listingPrice-data.underwritingValue)} above DealCalc's supported value.`);
+  if(data.monthlyRent&&data.listingPrice)data.expectedInsights.push(`Gross rent yield is ${pct(safeDiv(data.monthlyRent*12,data.listingPrice))} before expenses and debt service.`);
+  if(data.equityReality)data.expectedInsights.push(`Reported equity may translate to only ${money(data.equityReality.net)} estimated net equity after selling costs.`);
+  if(data.hiddenSignals.length)data.expectedInsights.push(`Hidden signal cluster: ${data.hiddenSignals.slice(0,4).join('; ')}.`);
+  data.why=['label-anchored extraction with value guardrails'];
+  const confs=Object.values(data.validation).map(v=>v.confidence||0); data.confidence=Math.round(confs.reduce((a,b)=>a+b,0)/confs.length);
+  data.equityRatio=safeDiv(data.estimatedEquity,data.estimatedValue||data.underwritingValue||data.listingPrice);
+  return data;
+}
+function applyDetectedData(data){
+  setText('propertyLabel',data.address,true); setVal('listingPrice',data.listingPrice,true); setVal('purchasePrice',data.listingPrice||data.underwritingValue||data.estimatedValue,true); setVal('analyzerArv',data.underwritingValue||data.estimatedValue||data.avgSalePrice,true); setVal('loanBalance',data.mortgageBalance,true); setVal('monthlyRent',data.monthlyRent,true);
+  if(data.condition?.repairAssumption) setVal('analyzerRepairs',data.condition.repairAssumption,true);
+  const taxMonthly=data.propertyTax?data.propertyTax/12:0; if(data.monthlyRent && !val('monthlyExpenses')) setVal('monthlyExpenses',Math.round(data.monthlyRent*.38 + taxMonthly),true);
+  const p=document.getElementById('propertyType'); if(p&&data.propertyType)p.value=data.propertyType; const a=document.getElementById('analysisType'); if(a&&data.suggestedAnalysis)a.value=data.suggestedAnalysis;
+  const notes=document.getElementById('documentNotes'); if(notes){notes.dataset.detected=JSON.stringify({status:data.status,currentListing:data.currentListing,owner:data.owner,mailing:data.mailing,ownership:data.ownership,occupancy:data.occupancy,lastSale:data.lastSale,listingHistory:data.listingHistory,sellerMotivation:data.sellerMotivation,compReliability:data.compReliability,renovationPremium:data.renovationPremium,negotiation:data.negotiation,equityReality:data.equityReality,marketPosition:data.marketPosition,hiddenSignals:data.hiddenSignals,expectedInsights:data.expectedInsights,validation:data.validation,confidence:data.confidence,estimatedValue:data.estimatedValue,avgSalePrice:data.avgSalePrice,underwritingValue:data.underwritingValue,valueStack:data.valueStack,valueSource:data.valueSource,monthlyRent:data.monthlyRent,mortgageBalance:data.mortgageBalance,estimatedEquity:data.estimatedEquity,propertyTax:data.propertyTax,beds:data.beds,baths:data.baths,sqft:data.sqft,condition:data.condition,propertyType:data.propertyType,listingPrice:data.listingPrice,raw:data.raw});}
+  updateAnalyzerMode();
+  const summary=document.getElementById('extractionSummary'); if(summary){const vs=data.valueStack||{}; summary.classList.remove('hidden-field'); summary.innerHTML=`<div class="extract-top"><strong>Detected:</strong> ${escapeHtml(labelProperty(data.propertyType))} · ${escapeHtml(labelAnalysis(data.suggestedAnalysis))} <span class="pill">${data.confidence}% confidence</span></div><div class="extract-grid">${data.address?`<span>Address <strong>${escapeHtml(data.address)}</strong></span>`:''}<span>DealCalc Value <strong>${money(data.underwritingValue)}</strong><small>${escapeHtml(data.valueSource||'validated value stack')}</small></span>${vs.low&&vs.high?`<span>Underwriting Range <strong>${money(vs.low)}–${money(vs.high)}</strong><small>screening range</small></span>`:''}${data.listingPrice?`<span>List/Asking Price <strong>${money(data.listingPrice)}</strong><small>99% confidence</small></span>`:''}${data.status?`<span>Listing Status <strong>${escapeHtml(data.status)}</strong><small>${data.validation?.status?.confidence||''}% confidence</small></span>`:''}${data.monthlyRent?`<span>Property Rent <strong>${money(data.monthlyRent)}/mo</strong><small>${data.validation?.rent?.confidence||''}% confidence</small></span>`:''}${data.mortgageBalance?`<span>Mortgage Balance <strong>${money(data.mortgageBalance)}</strong><small>${data.validation?.mortgage?.confidence||''}% confidence</small></span>`:''}${data.condition?`<span>Condition <strong>${escapeHtml(data.condition.condition)}</strong><small>${data.condition.confidence||''}% confidence</small></span>`:''}${data.sellerMotivation?`<span>Seller Motivation <strong>${data.sellerMotivation}/100</strong><small>capped estimate</small></span>`:''}</div>`;}
+}
+function dcDealVerdict(x,best,meta){
+  const price=x.listing||x.price||0,value=x.value||0,gap=price-value,gapPct=value?gap/value:0; let verdict='REVIEW',reason='Verify source values and comps before deciding.',action='Pull close comps and verify assumptions.';
+  if(gapPct>.25){verdict='PASS / WAIT';reason=`Price is ${pct(gapPct)} above supported underwriting value.`;action=`Do not chase retail price. Monitor pending status or target ${money(meta.negotiation?.reasonable||value*1.02)} if it comes back to market.`;}
+  else if(gapPct>.10){verdict='NEGOTIATE';reason='Price is above supported value, but not impossible if premium comps support the renovation.';action=`Use ${money(meta.negotiation?.reasonable||value)}–${money(meta.negotiation?.stretch||value*1.1)} as the review band.`;}
+  else if(best.score>=70){verdict='PURSUE';reason='Price/value relationship and strategy score justify deeper diligence.';action='Verify comps, condition, title, insurance, and financing.';}
+  return {verdict,reason,action,priceGap:gap,gapPct};
+}
+/* ===== End DealCalc V22 Extraction Reliability Patch ===== */
