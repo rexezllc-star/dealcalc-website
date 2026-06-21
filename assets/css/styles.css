@@ -72,3 +72,7 @@
 .deal-verdict-card h2{margin:.2rem 0 .5rem;font-size:2rem}.deal-verdict-card.good{border-color:rgba(71,208,124,.45);background:rgba(71,208,124,.08)}.deal-verdict-card.watch{border-color:rgba(245,184,72,.45);background:rgba(245,184,72,.08)}.deal-verdict-card.bad{border-color:rgba(244,99,99,.45);background:rgba(244,99,99,.08)}
 .score-breakdown{display:grid;gap:10px;margin:12px 0 18px}.score-line{display:grid;grid-template-columns:120px 42px 1fr;gap:10px;align-items:center}.score-line div{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}.score-line i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#f5b84a,#47d07c)}
 .audit-table{width:100%;border-collapse:collapse;font-size:.9rem}.audit-table th,.audit-table td{border-bottom:1px solid rgba(255,255,255,.1);padding:8px;text-align:left}.extraction-audit{margin-top:18px}.v20-report .eyebrow{letter-spacing:.08em}
+
+/* V21 investor intelligence modules */
+.intelligence-grid .metric strong{font-size:1.15rem}.hidden-signal-list li::marker,.alpha-list li::marker{color:var(--gold)}
+.strategy-grid-explained .strategy-card p{margin:.45rem 0 0;color:var(--muted);font-size:.78rem;line-height:1.35}.v21-report+.deal-verdict-card h2{letter-spacing:.01em}
