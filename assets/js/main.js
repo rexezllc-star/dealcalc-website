@@ -171,7 +171,7 @@ function analyzeDealV6(manual=false){
     <h3>What this means</h3><ul class="small-list">${bullets}</ul>
     <h3>Next checks</h3><ol class="small-list">${steps}</ol>
     <p class="muted tiny-note">Educational estimate only. DealCalc does not replace professional appraisal, inspection, legal, tax, financing, or title review.</p>
-    <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Print / Save Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
+    <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Export / Print Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
   trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:risk,manual:manual});
 }
 
@@ -347,7 +347,7 @@ function analyzeDealV6(manual=false){
     <h3>Information worth knowing</h3><ul class="small-list">${bullets}</ul>
     <h3>Next checks</h3><ol class="small-list">${steps}</ol>
     <p class="muted tiny-note">Educational estimate only. Values are extracted from the uploaded document and should be verified against public records, sold comps, inspection, title, financing, and local market review.</p>
-    <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Print / Save Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
+    <p class="cta-row"><button class="btn" onclick="dcSaveCurrentDeal()" type="button">Save Deal</button><button class="btn secondary" onclick="window.print()">Export / Print Report</button></p><p id="saveDealMsg" class="muted status-line"></p>`;
   trackEvent('deal_analyzed',{analysis_type:best.type,property_type:x.propertyType,score:best.score,risk:risk,manual:manual,value_source:meta.valueSource||''});
 }
 async function handleDealPdfUpload(event){

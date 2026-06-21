@@ -1,38 +1,22 @@
-# DealCalc Full Update V15 — Cleanup + Feature Stabilization
+# DealCalc Full Update V16
 
-Upload/replace the full contents of this folder into the GitHub repository root.
+Upload the full contents of this folder to the GitHub repository root and overwrite existing files.
 
-## Primary fixes
-- Removes duplicate Login buttons.
-- Removes public version labels like V12/V14 from live pages.
-- Standardizes global navigation.
-- Hides Dashboard from the static nav until auth script resolves user state.
-- Improves dashboard logged-out state instead of showing indefinite loading.
-- Keeps calculator form above other-calculator navigation.
-- Keeps `calculator/` and `calculators/` folders synced.
-- Updates calculator scripts to `assets/js/calculators-v15.js` for cache busting.
-- Adds basic Vercel security headers.
+V16 includes:
+- Cleanup of public version labels and duplicate login behavior
+- Shorter homepage/directory/analyzer hero sections
+- Homepage primary CTA toward PDF upload
+- Dashboard deal tracker pipeline
+- Saved deal status updates
+- Saved report view with export/print
+- Related guide links on every calculator page
+- Calculator folders synced: `calculator/` and `calculators/`
+- Cache-busted calculator script: `assets/js/calculators-v16.js`
+- Vercel apex-domain redirect from `dealcalc.io` to `www.dealcalc.io`
+- Security headers
 
-## Important files to replace
-- `index.html`
-- `calculators.html`
-- `contact.html`
-- `dashboard.html`
-- `tools/ai-deal-analyzer.html`
-- `calculator/`
-- `calculators/`
-- `assets/css/styles.css`
-- `assets/js/auth.js`
-- `assets/js/calculators-v15.js`
-- `vercel.json`
-
-## Supabase
-Keep using your existing Supabase setup. If you have not configured it yet, update:
-
-`assets/js/supabase-config.js`
-
-and run:
-
-`SUPABASE_SETUP.sql`
-
-in Supabase SQL Editor.
+After upload:
+1. Commit and push to GitHub.
+2. Confirm Vercel deploy succeeds.
+3. Open `/calculators.html`, `/calculator/land-flip-calculator.html`, `/tools/ai-deal-analyzer.html`, and `/dashboard.html`.
+4. If Supabase is connected, run the updated `SUPABASE_SETUP.sql` so the `status` column exists.

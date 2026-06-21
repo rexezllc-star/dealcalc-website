@@ -50,3 +50,13 @@
 .calculator-v14 .calc-nav-card em{font-size:11px;}
 @media(max-width:1000px){.calculator-v14 .tool{grid-template-columns:1fr}.calculator-v14 .result-box{position:static}.calculator-v14 .calc-nav-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.calculator-v14 .hero{padding:30px 6% 12px}.calculator-v14 .calc-primary{padding-top:12px}.calculator-v14 .form-grid{grid-template-columns:1fr}.calculator-v14 .calc-nav-grid{display:flex;overflow-x:auto;padding-bottom:8px}.calculator-v14 .calc-nav-card{min-width:170px}}
+
+
+/* V16 product polish */
+.hero-compact{padding-top:56px!important;padding-bottom:44px!important;}
+.trust-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 10px}.trust-row span{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.035);color:var(--muted)}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}.dashboard-actions{display:flex;gap:10px;flex-wrap:wrap}.dashboard-actions input,.dashboard-actions select{min-width:180px}
+.pipeline-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}.pipeline-card{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);border-radius:18px;padding:16px}.pipeline-card strong{display:block;font-size:2rem;color:var(--gold)}.pipeline-card span{color:var(--muted);font-size:.9rem}
+.deal-card select{width:100%;margin:6px 0 10px}.printable-report{max-width:980px}.printable-report .cta-row{display:none}
+@media print{.site-header,.site-footer,.dashboard-actions,.pipeline-grid,.btn,.calc-nav-section,.hero{display:none!important}.card{box-shadow:none!important;border:1px solid #ddd!important;color:#111!important;background:#fff!important}.printable-report{display:block!important}.result-box,.analyzer-report{color:#111!important;background:#fff!important}}
+@media (max-width:720px){.hero-compact{padding-top:34px!important;padding-bottom:30px!important}.section-head{display:block}.dashboard-actions input,.dashboard-actions select{width:100%}}

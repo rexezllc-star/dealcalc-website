@@ -11,6 +11,7 @@ create table if not exists public.deals (
   verdict text,
   inputs jsonb,
   report_html text,
+  status text default 'Lead',
   created_at timestamptz not null default now()
 );
 
@@ -40,3 +41,5 @@ create policy "Users can delete their own deals"
 on public.deals for delete
 to authenticated
 using (auth.uid() = user_id);
+
+ALTER TABLE public.deals ADD COLUMN IF NOT EXISTS status text DEFAULT 'Lead';
