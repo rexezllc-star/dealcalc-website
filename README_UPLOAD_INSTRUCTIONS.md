@@ -1,35 +1,34 @@
-# DealCalc Full Update V5 — AI Analyzer Optimization
+# DealCalc Full Update V6
 
-Upload/replace the full contents of this folder into the GitHub repository root.
+## What changed
 
-## Main V5 Changes
+V6 focuses on making the AI Deal Analyzer more presentable and more useful.
 
-- AI Analyzer now separates **Property Type** from **Analysis Goal**.
-- PDF upload now attempts to auto-detect whether the document is vacant land, SFR/residential, multifamily, condo, or unknown.
-- PDF upload now suggests the best analysis path automatically:
-  - Vacant Land Analysis
-  - Homeowner Equity Analysis
-  - Rental / Buy & Hold Analysis
-  - Retail Listing / Overpay Check
-  - Fix & Flip Analysis
-  - Wholesale Assignment Analysis
-- Optimized for CMA reports like the uploaded examples:
-  - `Property Type: Land` triggers land analysis.
-  - `Single Family (SFR)`, beds/baths/sq ft, rent, mortgage balance, and equity trigger residential/rental/equity analysis.
-- Adds extraction summary after PDF upload.
-- Adds listing price field and retail overpay check.
-- Preserves manual override: users can change property type or analysis goal after PDF detection.
+### Key improvements
 
-## Files Most Important to Replace
+- PDF upload is now the first step.
+- Analysis starts automatically after upload.
+- The analyzer no longer dumps a wall of extracted text as the main output.
+- Results are displayed as a concise investor-style deal brief.
+- Strategy comparison is shown in score cards.
+- Output includes:
+  - Deal Score
+  - Best-fit strategy
+  - Key financial metrics
+  - What the numbers mean
+  - Next diligence checks
+- Extracted PDF details are summarized separately.
+- Raw extracted text is hidden inside an optional details section.
+- Manual input edits auto-refresh the analysis after a short delay.
+
+## Files to replace
+
+Upload the full folder contents to your GitHub repository root and replace existing files.
+
+Most important files:
 
 - `tools/ai-deal-analyzer.html`
 - `assets/js/main.js`
 - `assets/css/styles.css`
-- `README_UPLOAD_INSTRUCTIONS.md`
 
-After upload:
-
-1. Commit changes.
-2. Push to GitHub.
-3. Wait for Vercel deployment.
-4. Test with the two CMA PDFs.
+Then commit and push. Vercel should redeploy automatically.

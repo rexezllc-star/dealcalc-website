@@ -1,14 +1,14 @@
 <!doctype html>
-<!-- DEALCALC V5 ANALYZER: Auto-detects property type and suggested analysis from uploaded PDFs, then applies strategy-specific scoring. -->
+<!-- DEALCALC V6 ANALYZER: Upload-first, auto-runs after PDF extraction, concise investor report output. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Deal Analyzer | DealCalc.io</title>
-  <meta name="description" content="Analyze wholesale, fix and flip, rental, vacant land, and homeowner equity scenarios using profit, equity, MAO, risk, and deal score metrics.">
+  <meta name="description" content="Upload a CMA, MLS sheet, property flyer, or deal packet and get a concise real estate deal score, best strategy, risk flags, and investor-ready summary.">
   <link rel="canonical" href="https://dealcalc.io/tools/ai-deal-analyzer.html">
   <meta property="og:title" content="AI Deal Analyzer | DealCalc.io">
-  <meta property="og:description" content="Score wholesale, flip, rental, land, and homeowner equity scenarios with transparent deal-analysis logic.">
+  <meta property="og:description" content="Auto-analyze real estate PDFs for equity, flip profit, rental cash flow, land flip upside, and overpay risk.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://dealcalc.io/tools/ai-deal-analyzer.html">
   <link rel="stylesheet" href="/assets/css/styles.css">
@@ -27,20 +27,36 @@
   </nav>
 </header>
 <main>
-  <section class="hero">
-    <p class="eyebrow">AI Deal Analyzer V5</p>
-    <h1>Upload a CMA, MLS sheet, flyer, or deal packet. DealCalc detects the property type, suggests the best analysis, and scores the deal.</h1>
-    <p>Upload a PDF or enter numbers manually. DealCalc separates property type from investment strategy, extracts key data, estimates profit/equity/cash flow, and recommends the next best action.</p>
+  <section class="hero analyzer-hero">
+    <p class="eyebrow">AI Deal Analyzer V6</p>
+    <h1>Upload a property PDF. DealCalc starts the analysis automatically.</h1>
+    <p>Built for CMAs, MLS sheets, seller packets, Zillow-style flyers, land packets, and offering memorandums. DealCalc extracts the important numbers, detects the property type, compares strategies, and gives a concise investor-style recommendation.</p>
   </section>
 
-  <section class="section tool wide-tool">
-    <div class="card">
-      <h2>Deal Inputs</h2>
-      <div class="form-grid">
+  <section class="section analyzer-layout">
+    <div class="card upload-first-card">
+      <div class="step-label">Step 1</div>
+      <h2>Upload Deal Document</h2>
+      <p class="muted">Best results: CMA, MLS printout, property flyer, seller packet, or deal sheet with visible price, value, rent, taxes, beds/baths, square footage, or comps.</p>
+      <label class="drop-zone" for="dealPdf">
+        <span class="drop-icon">↑</span>
+        <strong>Choose PDF to analyze</strong>
+        <small>Analysis starts automatically after upload</small>
+      </label>
+      <input id="dealPdf" class="visually-hidden" type="file" accept="application/pdf" onchange="handleDealPdfUpload(event)">
+      <p id="pdfStatus" class="muted status-line">No PDF uploaded yet.</p>
+      <div id="extractionSummary" class="extract-box hidden-field"></div>
+    </div>
+
+    <div class="card compact-input-card">
+      <div class="step-label">Step 2</div>
+      <h2>Review / Override</h2>
+      <p class="muted">DealCalc will fill what it recognizes. You can adjust the goal or numbers and the result updates automatically.</p>
+      <div class="form-grid compact-form">
         <div>
           <label>Property Type</label>
-          <select id="propertyType" onchange="updateAnalyzerMode()">
-            <option value="auto">Auto-detect from PDF / inputs</option>
+          <select id="propertyType" onchange="updateAnalyzerMode(); analyzeDealV6(false);">
+            <option value="auto">Auto-detect</option>
             <option value="land">Vacant Land</option>
             <option value="sfr">Single Family / Residential</option>
             <option value="multi">Multifamily</option>
@@ -50,88 +66,49 @@
         </div>
         <div>
           <label>Analysis Goal</label>
-          <select id="analysisType" onchange="updateAnalyzerMode()">
-            <option value="auto">Auto-suggest best analysis</option>
-            <option value="wholesale">Wholesale Assignment</option>
-            <option value="flip">Fix & Flip</option>
-            <option value="rental">Rental / Buy & Hold</option>
-            <option value="land">Vacant Land Flip</option>
-            <option value="homeowner">Homeowner Equity</option>
+          <select id="analysisType" onchange="updateAnalyzerMode(); analyzeDealV6(false);">
+            <option value="auto">Auto-pick best strategy</option>
             <option value="retail">Retail Listing / Overpay Check</option>
+            <option value="homeowner">Homeowner Equity</option>
+            <option value="rental">Rental / Buy & Hold</option>
+            <option value="flip">Fix & Flip</option>
+            <option value="wholesale">Wholesale Assignment</option>
+            <option value="land">Vacant Land Flip</option>
           </select>
         </div>
-        <div>
-          <label>Property Address / Label</label>
-          <input id="propertyLabel" placeholder="123 Main St or Deal A">
-        </div>
-        <div>
-          <label>Listing Price / Asking Price</label>
-          <input id="listingPrice" type="number" placeholder="395000">
-        </div>
-        <div>
-          <label>Purchase Price / Current Value / Offer</label>
-          <input id="purchasePrice" type="number" placeholder="110000">
-        </div>
-        <div>
-          <label>ARV / Resale Value</label>
-          <input id="analyzerArv" type="number" placeholder="250000">
-        </div>
-        <div>
-          <label>Repair / Improvement Costs</label>
-          <input id="analyzerRepairs" type="number" placeholder="45000">
-        </div>
-        <div>
-          <label>Assignment Fee / Desired Profit / Cash Invested</label>
-          <input id="assignmentFee" type="number" placeholder="15000">
-        </div>
-        <div>
-          <label>Closing / Selling Costs</label>
-          <input id="closingCosts" type="number" placeholder="4000">
-        </div>
-        <div>
-          <label>Holding / Financing Costs</label>
-          <input id="holdingCosts" type="number" placeholder="3000">
-        </div>
-        <div class="mode rental-mode homeowner-mode hidden-field">
-          <label>Mortgage / Loan Balance</label>
-          <input id="loanBalance" type="number" placeholder="185000">
-        </div>
-        <div class="mode rental-mode hidden-field">
-          <label>Monthly Rent</label>
-          <input id="monthlyRent" type="number" placeholder="2200">
-        </div>
-        <div class="mode rental-mode hidden-field">
-          <label>Monthly Expenses</label>
-          <input id="monthlyExpenses" type="number" placeholder="1450">
-        </div>
-        <div class="mode homeowner-mode hidden-field">
-          <label>Estimated Sale Prep Costs</label>
-          <input id="salePrepCosts" type="number" placeholder="5000">
-        </div>
+        <div><label>Address / Label</label><input id="propertyLabel" placeholder="Property address"></div>
+        <div><label>Listing / Asking Price</label><input id="listingPrice" type="number" placeholder="395000"></div>
+        <div><label>Offer / Purchase / Current Value</label><input id="purchasePrice" type="number" placeholder="300000"></div>
+        <div><label>Estimated Value / ARV</label><input id="analyzerArv" type="number" placeholder="350000"></div>
+        <div><label>Repairs / Improvements</label><input id="analyzerRepairs" type="number" placeholder="35000"></div>
+        <div><label>Desired Profit / Cash Invested / Fee</label><input id="assignmentFee" type="number" placeholder="15000"></div>
+        <div><label>Closing / Selling Costs</label><input id="closingCosts" type="number" placeholder="8000"></div>
+        <div><label>Holding / Financing Costs</label><input id="holdingCosts" type="number" placeholder="4000"></div>
+        <div class="mode rental-mode homeowner-mode retail-mode hidden-field"><label>Mortgage / Loan Balance</label><input id="loanBalance" type="number" placeholder="247681"></div>
+        <div class="mode rental-mode retail-mode hidden-field"><label>Monthly Rent</label><input id="monthlyRent" type="number" placeholder="2162"></div>
+        <div class="mode rental-mode hidden-field"><label>Monthly Expenses</label><input id="monthlyExpenses" type="number" placeholder="1600"></div>
+        <div class="mode homeowner-mode hidden-field"><label>Sale Prep Costs</label><input id="salePrepCosts" type="number" placeholder="5000"></div>
       </div>
-
-      <div class="upload-panel">
-        <h3>Optional PDF Upload</h3>
-        <p class="muted">Upload a CMA, MLS printout, Zillow flyer, property flyer, seller packet, or OM. DealCalc reads the PDF in your browser, detects whether it is land or residential, suggests the right analysis type, and pre-fills recognized numbers.</p>
-        <input id="dealPdf" type="file" accept="application/pdf" onchange="handleDealPdfUpload(event)">
-        <p id="pdfStatus" class="muted">No PDF uploaded yet.</p>
-        <div id="extractionSummary" class="extract-box hidden-field"></div>
-        <textarea id="documentNotes" placeholder="Extracted PDF text or notes will appear here. You can also paste listing details, seller notes, rent estimates, tax notes, or repair notes."></textarea>
-      </div>
-
-      <p class="cta-row"><button class="btn" onclick="analyzeDealV5()">Analyze Deal</button><button class="btn secondary" onclick="clearAnalyzer()" type="button">Clear</button></p>
+      <details class="notes-details">
+        <summary>Show extracted text / paste notes</summary>
+        <textarea id="documentNotes" placeholder="Extracted PDF text appears here. You can also paste listing details or seller notes."></textarea>
+      </details>
+      <p class="cta-row"><button class="btn" onclick="analyzeDealV6(true)">Refresh Analysis</button><button class="btn secondary" onclick="clearAnalyzer()" type="button">Clear</button></p>
     </div>
 
-    <aside class="result-box" id="analysisResult">
-      <h3>Deal analysis will appear here.</h3>
-      <p class="muted">Upload a PDF to auto-detect property type and recommended analysis, or manually choose your strategy.</p>
+    <aside class="result-box analyzer-report" id="analysisResult">
+      <div class="empty-state">
+        <p class="eyebrow">Ready</p>
+        <h3>Upload a PDF and DealCalc will start automatically.</h3>
+        <p class="muted">The result will be a clean deal brief, not a wall of extracted text.</p>
+      </div>
     </aside>
   </section>
 
   <section class="section grid three-info">
-    <div class="card"><h2>For Investors</h2><p class="muted">Estimate MAO, spread, flip profit, rental cash flow, and land resale upside.</p></div>
-    <div class="card"><h2>For Homeowners</h2><p class="muted">Estimate current equity, sale proceeds, and whether selling or refinancing may make sense.</p></div>
-    <div class="card"><h2>For PDFs</h2><p class="muted">Optimized for CMA reports, MLS printouts, listing flyers, OMs, and seller packets. Scanned image PDFs may still need manual entry.</p></div>
+    <div class="card"><h2>Auto-Detects</h2><p class="muted">Property type, listing status, value, price, mortgage balance, equity, rent, taxes, and basic comparable signals when present.</p></div>
+    <div class="card"><h2>Compares Strategies</h2><p class="muted">Retail overpay check, homeowner equity, rental, flip, wholesale, and vacant land analysis are scored separately.</p></div>
+    <div class="card"><h2>Investor Output</h2><p class="muted">Designed to answer: Is this a deal, what is the best strategy, what are the risks, and what should I verify next?</p></div>
   </section>
 </main>
 <footer class="site-footer">
