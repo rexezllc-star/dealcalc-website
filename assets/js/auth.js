@@ -3,13 +3,18 @@ function dcHasSupabaseConfig(){return window.DEALCALC_SUPABASE_URL && !String(wi
 function dcClient(){if(!dcHasSupabaseConfig() || !window.supabase)return null; return window.supabase.createClient(window.DEALCALC_SUPABASE_URL, window.DEALCALC_SUPABASE_ANON_KEY)}
 function dcLocalDeals(){try{return JSON.parse(localStorage.getItem('dealcalc_saved_deals')||'[]')}catch(e){return []}}
 function dcSetLocalDeals(deals){localStorage.setItem('dealcalc_saved_deals',JSON.stringify(deals||[]))}
-async function dcCurrentUser(){const sb=dcClient(); if(!sb)return null; const {data}=await sb.auth.getUser(); return data?.user||null}
+async function dcCurrentUser(){const sb=dcClient(); if(!sb)return null; try{const {data}=await sb.auth.getUser(); return data?.user||null}catch(e){return null}}
 async function dcUpdateNav(){
   const nav=document.querySelector('.site-header nav'); if(!nav)return;
   const user=await dcCurrentUser();
-  const existing=nav.querySelector('[data-auth-link]'); if(existing)existing.remove();
-  const a=document.createElement('a'); a.dataset.authLink='true';
-  a.href=user?'/dashboard.html':'/auth.html'; a.textContent=user?'Dashboard':'Login'; nav.appendChild(a);
+  // Remove duplicate auth/login links first.
+  [...nav.querySelectorAll('[data-auth-link], a[href="/auth.html"], a[href="/dashboard.html"]')].forEach((el,i)=>{ if(i>0 || el.textContent.trim()==='Dashboard') el.remove(); });
+  let auth=nav.querySelector('[data-auth-link], a[href="/auth.html"]');
+  if(!auth){auth=document.createElement('a'); nav.appendChild(auth);}
+  auth.dataset.authLink='true';
+  auth.classList.add('login-pill');
+  auth.href=user?'/dashboard.html':'/auth.html';
+  auth.textContent=user?'Dashboard':'Login';
 }
 async function dcSignup(){
   const email=document.getElementById('authEmail')?.value?.trim(); const password=document.getElementById('authPassword')?.value; const msg=document.getElementById('authMsg');
@@ -58,10 +63,17 @@ async function dcSaveCurrentDeal(){
 async function dcLoadDashboard(){
   const box=document.getElementById('dashboardDeals'); if(!box)return;
   const sb=dcClient(); const user=await dcCurrentUser();
-  document.getElementById('dashboardUserEmail') && (document.getElementById('dashboardUserEmail').textContent=user?.email||'Local mode');
+  const emailEl=document.getElementById('dashboardUserEmail');
   let deals=[];
-  if(sb && user){const {data,error}=await sb.from('deals').select('*').order('created_at',{ascending:false}).limit(50); if(error){box.innerHTML='<p class="muted">Could not load saved deals: '+error.message+'</p>'; return} deals=data||[];}
-  else {deals=dcLocalDeals();}
+  if(sb && user){
+    if(emailEl)emailEl.textContent=user.email;
+    const {data,error}=await sb.from('deals').select('*').order('created_at',{ascending:false}).limit(50); if(error){box.innerHTML='<p class="muted">Could not load saved deals: '+escapeHtml(error.message)+'</p>'; return} deals=data||[];
+  } else {
+    if(emailEl)emailEl.textContent='Not logged in — showing local browser saves only';
+    deals=dcLocalDeals();
+    const gate=document.getElementById('dashboardGate');
+    if(gate)gate.innerHTML='<div class="card"><h3>Create an account to save across devices</h3><p class="muted">You can still save locally in this browser, but a free account lets you keep deal history across devices once Supabase is connected.</p><a class="btn" href="/auth.html">Log in / Sign up</a></div>';
+  }
   if(!deals.length){box.innerHTML='<div class="card"><h3>No saved deals yet.</h3><p class="muted">Run the AI Deal Analyzer and click Save Deal.</p><a class="btn" href="/tools/ai-deal-analyzer.html">Analyze a Deal</a></div>'; return}
   box.innerHTML=deals.map(d=>`<div class="card deal-card"><div class="deal-card-top"><div><h3>${escapeHtml(d.address||'Untitled Deal')}</h3><p class="muted">${escapeHtml(d.property_type||'Property')} · ${escapeHtml(d.analysis_type||'Analysis')} · ${new Date(d.created_at).toLocaleDateString()}</p></div><div class="mini-score">${d.score||'—'}</div></div><p><strong>${escapeHtml(d.verdict||'Saved analysis')}</strong></p><button class="btn secondary" onclick='dcOpenSavedDeal(${JSON.stringify(d.id||d.created_at)})'>View Details</button></div>`).join('');
 }

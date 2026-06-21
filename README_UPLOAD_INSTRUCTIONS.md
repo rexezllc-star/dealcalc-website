@@ -1,33 +1,38 @@
-# DealCalc Full Update V13
+# DealCalc Full Update V15 — Cleanup + Feature Stabilization
 
-Upload the full contents of this folder into the GitHub repository root and overwrite existing files.
+Upload/replace the full contents of this folder into the GitHub repository root.
 
-## What V13 fixes
+## Primary fixes
+- Removes duplicate Login buttons.
+- Removes public version labels like V12/V14 from live pages.
+- Standardizes global navigation.
+- Hides Dashboard from the static nav until auth script resolves user state.
+- Improves dashboard logged-out state instead of showing indefinite loading.
+- Keeps calculator form above other-calculator navigation.
+- Keeps `calculator/` and `calculators/` folders synced.
+- Updates calculator scripts to `assets/js/calculators-v15.js` for cache busting.
+- Adds basic Vercel security headers.
 
-- Places the Other Calculators navigation strip directly between the hero message and calculator form.
-- Keeps both `/calculator/` and `/calculators/` folders synchronized, but the public navigation uses `/calculator/`.
-- Updates every calculator page to V13 markers and cache-busted `assets/js/calculators-v13.js`.
-- Adds dedicated formulas, dedicated input fields, current-tool highlighting, and internal links across all 10 calculators.
-- Improves mobile layout, focus states, sticky results, footer consistency, and calculator page SEO schema.
+## Important files to replace
+- `index.html`
+- `calculators.html`
+- `contact.html`
+- `dashboard.html`
+- `tools/ai-deal-analyzer.html`
+- `calculator/`
+- `calculators/`
+- `assets/css/styles.css`
+- `assets/js/auth.js`
+- `assets/js/calculators-v15.js`
+- `vercel.json`
 
-## Upload checklist
+## Supabase
+Keep using your existing Supabase setup. If you have not configured it yet, update:
 
-Replace these folders/files:
+`assets/js/supabase-config.js`
 
-```text
-calculator/
-calculators/
-assets/js/calculators-v13.js
-assets/css/styles.css
-calculators.html
-README_UPLOAD_INSTRUCTIONS.md
-```
+and run:
 
-After Vercel deploys, open:
+`SUPABASE_SETUP.sql`
 
-```text
-https://www.dealcalc.io/calculator/land-flip-calculator.html
-https://www.dealcalc.io/calculator/cap-rate-calculator.html
-```
-
-You should see an Other Calculators card strip between the hero and the calculator form.
+in Supabase SQL Editor.
