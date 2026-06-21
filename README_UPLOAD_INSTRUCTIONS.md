@@ -1,19 +1,20 @@
-# DealCalc Full Update V17
+# DealCalc Full Update V19
 
-Research-based optimization release. Upload all contents to the GitHub root and overwrite existing files.
+Upload the full contents of this folder to the GitHub repository root and overwrite existing files.
 
-Key fixes:
-- AI Analyzer output upgraded from repeated extracted text to investor underwriting brief.
-- Adds valuation confidence, market/value read, risk flags, upside flags, and data-source explanation.
-- Removes public version labels from deal report output.
-- Improves AI Analyzer page copy around PDF extraction and strategy comparison.
-- Keeps V16 account, dashboard, calculators, tracker, and redirect improvements.
+V19 focuses on AI Analyzer underwriting quality:
 
-Critical files to overwrite:
+- Stronger CMA extraction logic
+- Property-level rent prioritization
+- Listing status and listing history signals
+- Condition/readiness extraction from listing text and photos section cues
+- Valuation range and weighted value stack
+- Source hierarchy: adjusted comp $/sqft, median sold comps, CMA avg sale price, CMA estimated value
+- Market trend extraction from CMA stats
+- Risk flags, upside, and “what a smart investor should notice” sections
+- Better default repair/expense assumptions based on detected condition, taxes, HOA, and rent
+
+Important files:
 - tools/ai-deal-analyzer.html
 - assets/js/main.js
 - assets/css/styles.css
-- index.html
-- calculator/ and calculators/ folders
-
-After deploy, hard refresh the browser and test with both CMA PDFs.
