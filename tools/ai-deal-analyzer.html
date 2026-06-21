@@ -32,6 +32,15 @@
       </label>
       <input id="dealPdf" class="visually-hidden" type="file" accept="application/pdf" onchange="handleDealPdfUpload(event)">
       <p id="pdfStatus" class="muted status-line">No PDF uploaded yet.</p>
+      <div class="url-analyze-box">
+        <label for="listingUrl"><strong>Or paste a listing URL</strong></label>
+        <div class="url-input-row">
+          <input id="listingUrl" type="url" placeholder="https://www.zillow.com/homedetails/... or https://www.redfin.com/...">
+          <button class="btn secondary" type="button" onclick="handleListingUrlAnalyze()">Analyze URL</button>
+        </div>
+        <small class="muted">Works best when you also paste listing details, upload a PDF, or use the browser print-to-PDF option. Direct Zillow/Redfin scraping may be blocked by browser/CORS restrictions.</small>
+      </div>
+
       <div id="extractionSummary" class="extract-box hidden-field"></div>
     </div>
 
@@ -103,7 +112,7 @@
   <div><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/disclaimer.html">Disclaimer</a><a href="/affiliate-disclosure.html">Affiliate Disclosure</a><a href="mailto:info@dealcalc.io">info@dealcalc.io</a></div>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="/assets/js/main-v30.js"></script>
+<script src="/assets/js/main-v31.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase-config.js"></script>
