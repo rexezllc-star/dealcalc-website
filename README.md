@@ -1,40 +1,44 @@
-# DealCalc Release 7.1 — Calculator & SEO Foundation
+# DealCalc Release 7.2 — Calculator UI System
 
-Controlled release. This package DOES NOT replace the homepage.
+This release upgrades all calculator/analyzer pages to the polished, aligned dashboard UI system.
 
-## Upload/replace files
+## Upload/replace
 
-- `calculators/rehab-cost-calculator.html`
-- `calculators/rental-property-analyzer.html`
-- `calculators/mao-calculator.html`
-- `articles/how-to-estimate-rehab-costs.html`
-- `articles/multifamily-rental-property-analysis-guide.html`
-- `sitemap.xml`
-- `robots.txt`
-- `ai-analyzer-tests/README.md`
-- `ai-analyzer-tests/expected_results_summary.json`
+- assets/dealcalc-ui.css
+- tools/ai-deal-analyzer.html
+- calculators/*.html
+- sitemap.xml
+- robots.txt
 
-## Purpose
+## Important
 
-- Upgrade Cash Flow into Rental Property Analyzer with unit count.
-- Add room-by-room Rehab Cost Calculator.
-- Add dedicated SEO calculator pages.
-- Add two Search Console-driven SEO articles.
-- Add AI Analyzer regression test reference.
-- Update sitemap/robots for indexing.
+This package does not replace the homepage.
+
+## Calculators included
+
+- Rental Property Analyzer
+- Rehab Cost Calculator
+- MAO Calculator
+- Assignment Fee Calculator
+- Double Close Calculator
+- Land Flip Calculator
+- Cap Rate Calculator
+- Cash-on-Cash Calculator
+- ARV Calculator
+- ROI Calculator
 
 ## Commit message
 
-DealCalc Release 7.1 Calculator SEO Foundation
+DealCalc Release 7.2 Calculator UI System
 
 ## Search Console after deployment
 
-Submit:
-- https://www.dealcalc.io/sitemap.xml
+Submit sitemap:
+https://www.dealcalc.io/sitemap.xml
 
-Request indexing:
-- https://www.dealcalc.io/calculators/rehab-cost-calculator.html
-- https://www.dealcalc.io/calculators/rental-property-analyzer.html
-- https://www.dealcalc.io/calculators/mao-calculator.html
-- https://www.dealcalc.io/articles/how-to-estimate-rehab-costs.html
-- https://www.dealcalc.io/articles/multifamily-rental-property-analysis-guide.html
+Request indexing for:
+- /tools/ai-deal-analyzer.html
+- /calculators/rental-property-analyzer.html
+- /calculators/rehab-cost-calculator.html
+- /calculators/mao-calculator.html
+- /calculators/assignment-fee-calculator.html
