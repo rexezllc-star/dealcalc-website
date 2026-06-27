@@ -73,11 +73,105 @@
 .score-breakdown{display:grid;gap:10px;margin:12px 0 18px}.score-line{display:grid;grid-template-columns:120px 42px 1fr;gap:10px;align-items:center}.score-line div{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}.score-line i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#f5b84a,#47d07c)}
 .audit-table{width:100%;border-collapse:collapse;font-size:.9rem}.audit-table th,.audit-table td{border-bottom:1px solid rgba(255,255,255,.1);padding:8px;text-align:left}.extraction-audit{margin-top:18px}.v20-report .eyebrow{letter-spacing:.08em}
 
-/* V21 investor intelligence modules */
-.intelligence-grid .metric strong{font-size:1.15rem}.hidden-signal-list li::marker,.alpha-list li::marker{color:var(--gold)}
-.strategy-grid-explained .strategy-card p{margin:.45rem 0 0;color:var(--muted);font-size:.78rem;line-height:1.35}.v21-report+.deal-verdict-card h2{letter-spacing:.01em}
+/* Sprint 1 Production MVP additions */
+.input-section-title{grid-column:1/-1;margin:10px 0 2px;padding:10px 12px;border-radius:12px;background:rgba(216,173,85,.08);border:1px solid rgba(216,173,85,.22);color:var(--gold);font-weight:900;letter-spacing:.04em;text-transform:uppercase;font-size:12px}.tool.wide-analyzer{grid-template-columns:1fr 1fr}.result-box .report-header{align-items:center}.result-box .score-badge strong{font-size:38px}.audit-table td:first-child,.audit-table th:first-child{font-weight:800}.workspace-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.workspace-card{border:1px solid var(--line);background:linear-gradient(180deg,#101624,#0b101a);border-radius:18px;padding:18px}.workspace-card strong{display:block;font-size:28px;color:var(--gold)}.feature-banner{border:1px solid rgba(216,173,85,.35);background:linear-gradient(135deg,rgba(216,173,85,.12),rgba(120,166,255,.06));border-radius:22px;padding:22px;margin-top:18px}.feature-banner h2{margin-top:0}.article-toc{border:1px solid var(--line);border-radius:18px;padding:16px;background:#0b111d;margin:18px 0}.article-toc a{display:block;margin:6px 0;color:#fff}.calc-primary .card details{border:1px solid var(--line);border-radius:16px;padding:14px;background:#080d16;margin-bottom:12px}.calc-primary .card details summary{cursor:pointer;font-weight:900;color:#fff}.calc-primary .card details[open] summary{color:var(--gold)}@media(max-width:1000px){.tool.wide-analyzer,.workspace-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.tool.wide-analyzer,.workspace-grid{grid-template-columns:1fr}.input-section-title{font-size:11px}}
 
-/* DealCalc V33 homepage analyzer bar */
-.home-analyzer-bar{display:grid;grid-template-columns:minmax(260px,1fr) auto auto;gap:12px;align-items:center;margin-top:28px;max-width:940px;background:rgba(16,22,36,.72);border:1px solid var(--line);border-radius:20px;padding:12px;box-shadow:0 18px 45px rgba(0,0,0,.18)}
-.home-analyzer-bar input{min-height:52px;font-size:15px;background:#080d16;border-color:#2b3850}.home-analyzer-bar .btn{min-height:52px;white-space:nowrap}.home-analyzer-note{font-size:14px;margin-top:10px!important;max-width:900px!important}.pdf-side-btn{border-color:rgba(216,173,85,.45)!important}
-@media(max-width:760px){.home-analyzer-bar{grid-template-columns:1fr}.home-analyzer-bar .btn{width:100%}}
+
+/* V18 AI Analyzer typography and readability upgrade */
+.ai-analyzer-page .hero.analyzer-hero h1{
+  font-size:clamp(42px,5.4vw,70px);
+  line-height:1.04;
+  max-width:980px;
+}
+.ai-analyzer-page .hero.analyzer-hero p{
+  font-size:clamp(18px,1.45vw,22px);
+  line-height:1.65;
+  max-width:920px;
+}
+.ai-analyzer-page .analyzer-layout{
+  max-width:1460px;
+  grid-template-columns:.95fr 1.08fr 1.12fr;
+  gap:24px;
+}
+.ai-analyzer-page .card,
+.ai-analyzer-page .result-box{
+  padding:28px;
+}
+.ai-analyzer-page .card h2,
+.ai-analyzer-page .result-box h2{
+  font-size:clamp(26px,2.2vw,34px);
+  line-height:1.16;
+  margin-top:6px;
+}
+.ai-analyzer-page .card h3,
+.ai-analyzer-page .result-box h3{
+  font-size:clamp(21px,1.6vw,28px);
+  line-height:1.25;
+}
+.ai-analyzer-page .card p,
+.ai-analyzer-page .result-box p,
+.ai-analyzer-page .muted,
+.ai-analyzer-page .notes-details summary{
+  font-size:16.5px;
+  line-height:1.65;
+}
+.ai-analyzer-page .step-label{
+  font-size:13px;
+  padding:7px 12px;
+}
+.ai-analyzer-page .compact-form{
+  gap:16px;
+}
+.ai-analyzer-page .compact-form label,
+.ai-analyzer-page label{
+  font-size:15px;
+  line-height:1.35;
+  margin-bottom:8px;
+}
+.ai-analyzer-page input,
+.ai-analyzer-page select,
+.ai-analyzer-page textarea{
+  font-size:16px;
+  padding:14px 15px;
+  min-height:50px;
+}
+.ai-analyzer-page textarea{
+  min-height:140px;
+}
+.ai-analyzer-page .drop-zone{
+  min-height:215px;
+  padding:30px;
+}
+.ai-analyzer-page .drop-zone strong{
+  font-size:19px;
+}
+.ai-analyzer-page .drop-zone small,
+.ai-analyzer-page .status-line,
+.ai-analyzer-page .tiny-note{
+  font-size:14.5px;
+  line-height:1.5;
+}
+.ai-analyzer-page .btn{
+  font-size:16px;
+  padding:14px 20px;
+}
+.ai-analyzer-page .trust-row span{
+  font-size:15px;
+}
+.ai-analyzer-page .three-info .card h2{
+  font-size:26px;
+}
+.ai-analyzer-page .three-info .card p{
+  font-size:16.5px;
+}
+@media(max-width:1180px){
+  .ai-analyzer-page .analyzer-layout{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:760px){
+  .ai-analyzer-page .hero.analyzer-hero h1{font-size:36px;}
+  .ai-analyzer-page .hero.analyzer-hero p{font-size:17px;}
+  .ai-analyzer-page .analyzer-layout{grid-template-columns:1fr;}
+  .ai-analyzer-page .card,.ai-analyzer-page .result-box{padding:22px;}
+  .ai-analyzer-page .compact-form{grid-template-columns:1fr;}
+  .ai-analyzer-page input,.ai-analyzer-page select,.ai-analyzer-page textarea{font-size:16px;}
+}
