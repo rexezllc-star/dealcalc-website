@@ -1,5 +1,11 @@
-# DealCalc Release 7.2 Inline CSS Repack
+# DealCalc Emergency Recovery Release 7.2 Fix
 
-Repacked with CSS embedded inside every page. No external stylesheet required.
+Purpose: restore the full site with inline CSS and no external dependencies.
 
-Commit: DealCalc Release 7.2 Inline CSS Fix
+Upload all files to GitHub root and commit:
+DealCalc Emergency Recovery 7.2 Fix
+
+After deploy:
+- Hard refresh browser
+- Open /, /tools/ai-deal-analyzer.html, /calculators/rental-property-analyzer.html
+- Resubmit sitemap in Search Console
