@@ -1,11 +1,24 @@
-# DealCalc Emergency Recovery Release 7.2 Fix
+# DealCalc Final Stabilization Release
 
-Purpose: restore the full site with inline CSS and no external dependencies.
+Purpose: restore the site to a stable, decent public state and pause active iteration.
 
-Upload all files to GitHub root and commit:
-DealCalc Emergency Recovery 7.2 Fix
+Includes:
+- Homepage
+- Calculator suite
+- Both /calculator/ and /calculators/ routes for compatibility
+- AI Deal Analyzer with PDF upload workflow
+- Learn hub with 20 articles restored
+- About, Contact, Privacy, Terms
+- Sitemap and robots
 
-After deploy:
-- Hard refresh browser
-- Open /, /tools/ai-deal-analyzer.html, /calculators/rental-property-analyzer.html
-- Resubmit sitemap in Search Console
+Commit:
+DealCalc Final Stabilization Release
+
+After deployment:
+1. Open homepage
+2. Open /learn/
+3. Open /tools/ai-deal-analyzer.html
+4. Open /calculator/rental-property-analyzer.html
+5. Open /calculator/rehab-cost-calculator.html
+6. Submit sitemap in Search Console
+7. Request indexing for homepage, Learn hub, AI Analyzer, Rehab Calculator, Rental Analyzer
