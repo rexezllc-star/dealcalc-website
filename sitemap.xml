@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.dealcalc.io/</loc></url>
-  <url><loc>https://www.dealcalc.io/tools/ai-deal-analyzer.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/rental-property-analyzer.html</loc></url>
+  <url><loc>https://www.dealcalc.io/about.html</loc></url>
+  <url><loc>https://www.dealcalc.io/contact.html</loc></url>
+  <url><loc>https://www.dealcalc.io/privacy.html</loc></url>
+  <url><loc>https://www.dealcalc.io/terms.html</loc></url>
+  <url><loc>https://www.dealcalc.io/learn.html</loc></url>
+  <url><loc>https://www.dealcalc.io/ai-analyzer.html</loc></url>
   <url><loc>https://www.dealcalc.io/calculators/rehab-cost-calculator.html</loc></url>
+  <url><loc>https://www.dealcalc.io/calculators/rental-property-analyzer.html</loc></url>
   <url><loc>https://www.dealcalc.io/calculators/mao-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/assignment-fee-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/double-close-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/land-flip-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/cap-rate-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/cash-on-cash-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/arv-calculator.html</loc></url>
-  <url><loc>https://www.dealcalc.io/calculators/roi-calculator.html</loc></url>
   <url><loc>https://www.dealcalc.io/articles/how-to-estimate-rehab-costs.html</loc></url>
   <url><loc>https://www.dealcalc.io/articles/multifamily-rental-property-analysis-guide.html</loc></url>
   <url><loc>https://www.dealcalc.io/articles/assignment-fee-guide.html</loc></url>
@@ -19,9 +17,4 @@
   <url><loc>https://www.dealcalc.io/articles/mao-guide.html</loc></url>
   <url><loc>https://www.dealcalc.io/articles/wholesale-vacant-land.html</loc></url>
   <url><loc>https://www.dealcalc.io/articles/land-due-diligence-checklist.html</loc></url>
-  <url><loc>https://www.dealcalc.io/about.html</loc></url>
-  <url><loc>https://www.dealcalc.io/contact.html</loc></url>
-  <url><loc>https://www.dealcalc.io/privacy.html</loc></url>
-  <url><loc>https://www.dealcalc.io/terms.html</loc></url>
-  <url><loc>https://www.dealcalc.io/learn.html</loc></url>
 </urlset>

@@ -1,44 +1,40 @@
-# DealCalc Release 7.2 — Calculator UI System
+# DealCalc Release 7.1 — Calculator & SEO Foundation
 
-This release upgrades all calculator/analyzer pages to the polished, aligned dashboard UI system.
+Controlled release. This package DOES NOT replace the homepage.
 
-## Upload/replace
+## Upload/replace files
 
-- assets/dealcalc-ui.css
-- tools/ai-deal-analyzer.html
-- calculators/*.html
-- sitemap.xml
-- robots.txt
+- `calculators/rehab-cost-calculator.html`
+- `calculators/rental-property-analyzer.html`
+- `calculators/mao-calculator.html`
+- `articles/how-to-estimate-rehab-costs.html`
+- `articles/multifamily-rental-property-analysis-guide.html`
+- `sitemap.xml`
+- `robots.txt`
+- `ai-analyzer-tests/README.md`
+- `ai-analyzer-tests/expected_results_summary.json`
 
-## Important
+## Purpose
 
-This package does not replace the homepage.
-
-## Calculators included
-
-- Rental Property Analyzer
-- Rehab Cost Calculator
-- MAO Calculator
-- Assignment Fee Calculator
-- Double Close Calculator
-- Land Flip Calculator
-- Cap Rate Calculator
-- Cash-on-Cash Calculator
-- ARV Calculator
-- ROI Calculator
+- Upgrade Cash Flow into Rental Property Analyzer with unit count.
+- Add room-by-room Rehab Cost Calculator.
+- Add dedicated SEO calculator pages.
+- Add two Search Console-driven SEO articles.
+- Add AI Analyzer regression test reference.
+- Update sitemap/robots for indexing.
 
 ## Commit message
 
-DealCalc Release 7.2 Calculator UI System
+DealCalc Release 7.1 Calculator SEO Foundation
 
 ## Search Console after deployment
 
-Submit sitemap:
-https://www.dealcalc.io/sitemap.xml
+Submit:
+- https://www.dealcalc.io/sitemap.xml
 
-Request indexing for:
-- /tools/ai-deal-analyzer.html
-- /calculators/rental-property-analyzer.html
-- /calculators/rehab-cost-calculator.html
-- /calculators/mao-calculator.html
-- /calculators/assignment-fee-calculator.html
+Request indexing:
+- https://www.dealcalc.io/calculators/rehab-cost-calculator.html
+- https://www.dealcalc.io/calculators/rental-property-analyzer.html
+- https://www.dealcalc.io/calculators/mao-calculator.html
+- https://www.dealcalc.io/articles/how-to-estimate-rehab-costs.html
+- https://www.dealcalc.io/articles/multifamily-rental-property-analysis-guide.html
