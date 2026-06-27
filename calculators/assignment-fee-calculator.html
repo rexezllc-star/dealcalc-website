@@ -2,10 +2,10 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LVWBTX8RQB"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LVWBTX8RQB');</script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MAO Calculator | DealCalc.io</title>
-<meta name="description" content="Calculate maximum allowable offer using ARV, rule percentage, repairs, profit, and cost buffer.">
+<title>Assignment Fee Calculator | DealCalc.io</title>
+<meta name="description" content="Calculate wholesale assignment fee, spread, net profit, and margin.">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<link rel="canonical" href="https://www.dealcalc.io/calculators/mao-calculator.html">
+<link rel="canonical" href="https://www.dealcalc.io/calculators/assignment-fee-calculator.html">
 <link rel="stylesheet" href="/assets/dealcalc-ui.css">
 <meta name="theme-color" content="#050814">
 </head><body>
@@ -16,11 +16,11 @@
 </div><a href="/tools/ai-deal-analyzer.html" class="dc-cta">Analyze Deal</a></div></nav>
 <main class="dc-page">
   <div class="dc-hero">
-    <div><span class="dc-kicker">DealCalc Calculator</span><h1>MAO Calculator</h1><p class="dc-lead">Calculate the highest price you can offer while preserving buyer profit and margin.</p></div>
+    <div><span class="dc-kicker">DealCalc Calculator</span><h1>Assignment Fee Calculator</h1><p class="dc-lead">Estimate your wholesale assignment spread and net profit before presenting the deal.</p></div>
   </div>
   <div class="dc-layout">
     <section>
-      <div class="dc-card dc-section-card"><div class="dc-card-title"><span class="dc-icon">▣</span>Inputs</div><div class="dc-form-grid"><div><label>ARV / Resale Value</label><input id="arv" type="number" value="240000"></div><div><label>Investor Rule %</label><input id="rule" type="number" value="70"></div><div><label>Repair Cost</label><input id="repairs" type="number" value="45000"></div><div><label>Target Profit / Fee</label><input id="profit" type="number" value="25000"></div><div><label>Cost Buffer</label><input id="buffer" type="number" value="7500"></div></div></div>
+      <div class="dc-card dc-section-card"><div class="dc-card-title"><span class="dc-icon">▣</span>Inputs</div><div class="dc-form-grid"><div><label>Contract Price</label><input id="contract" type="number" value="44000"></div><div><label>Buyer Price</label><input id="buyer" type="number" value="52000"></div><div><label>Marketing / Closing Costs</label><input id="costs" type="number" value="500"></div><div><label>Earnest Money</label><input id="earnest" type="number" value="1000"></div></div></div>
       <p class="dc-note">Educational estimate only. Verify assumptions with local professionals before making investment, lending, legal, tax, or brokerage decisions.</p>
     </section>
     <aside class="dc-results">
@@ -44,7 +44,7 @@
       </div>
     </aside>
   </div>
-  <div class="dc-related"><a href="/calculators/rehab-cost-calculator.html"><b>Rehab Calculator</b><span>Estimate repair budget first.</span></a><a href="/articles/mao-guide.html"><b>MAO Guide</b><span>Learn the maximum allowable offer formula.</span></a></div>
+  <div class="dc-related"><a href="/calculators/mao-calculator.html"><b>MAO Calculator</b><span>Check offer discipline.</span></a><a href="/articles/assignment-fee-guide.html"><b>Assignment Fee Guide</b><span>Learn assignment fee basics.</span></a></div>
 </main>
 <script>
 const money=n=>Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
@@ -54,7 +54,7 @@ function set(id,v){document.getElementById(id).innerHTML=v}
 function row(k,v){return `<div class="dc-summary-row"><span>${k}</span><b>${v}</b></div>`}
 function track(e){if(typeof gtag==='function')gtag('event',e)}
 
-function runCalc(){let mao=val('arv')*(val('rule')/100)-val('repairs')-val('profit')-val('buffer'), disc=1-(mao/val('arv')); let score=Math.max(0,Math.min(100,60+(disc*70))); set('primary',money(mao)); set('secondary',money(val('repairs'))); set('third',pct(disc)); set('score',Math.round(score)); set('grade',score>=70?'Good':'Review'); set('summary',row('ARV',money(val('arv')))+row('Rule Amount',money(val('arv')*(val('rule')/100)))+row('Repairs',money(val('repairs')))+row('Target Profit',money(val('profit')))+row('Buffer',money(val('buffer')))); track('mao_calculator_calculate')}
+function runCalc(){let fee=val('buyer')-val('contract'), net=fee-val('costs'), margin=net/val('buyer'), score=Math.max(0,Math.min(100,margin*420)); set('primary',money(fee)); set('secondary',money(net)); set('third',pct(margin)); set('score',Math.round(score)); set('grade',score>=70?'Strong':score>=45?'Review':'Thin'); set('summary',row('Gross Assignment Fee',money(fee))+row('Net Profit',money(net))+row('Buyer Price',money(val('buyer')))+row('Earnest Money',money(val('earnest')))); track('assignment_fee_calculate')}
 
 function resetDefaults(){document.querySelectorAll('input').forEach(i=>i.value=i.defaultValue);runCalc()}
 runCalc();
