@@ -1,0 +1,6 @@
+file,scenario,must_extract,expected_behavior
+01_houston_cma_retail_overpay.pdf,Retail CMA with conflicting list price vs closed comps,"address, pending status, list price, rent, mortgage balance, condition, comp average",Warn overpriced; use closed comps; distressed No
+02_distressed_wholesale_seller_packet.pdf,Distressed off-market wholesale lead,"ARV, repairs, seller ask, rent, distress language",Recommend wholesale/flip only if buyer max supports assignment fee
+03_duplex_rental_analysis_packet.pdf,Stabilized duplex rental,"units, rents, expenses, mortgage, value",Calculate rental metrics and highlight DSCR/cash flow
+04_vacant_land_flyer_spring_hill.pdf,Vacant land flyer,"parcel, lot size, zoning, price, taxes, due diligence risks",Land strategy; no rehab/rental assumptions
+05_low_data_property_flyer.pdf,Low-data flyer,limited data only,Flag low confidence and avoid hallucination
