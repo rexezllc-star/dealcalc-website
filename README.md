@@ -1,23 +1,12 @@
-# DealCalc v12 Final Polish & Internal Linking
+# DealCalc v12 Calculator Display Fix
 
-This is intended as the final production polish release before the 90-day indexing pause.
+Focused homepage correction only.
 
 Changes:
-- Removes homepage yellow-box wording mentioning exit assumptions.
-- Replaces it with cleaner AI Recommendation copy.
-- Adds homepage credibility metrics.
-- Adds final homepage CTA.
-- Expands footer.
-- Improves Contact and About.
-- Improves AI Analyzer output fields.
-- Adds related tools/internal links.
-- Replaces generic calculator labels with investor terminology.
-- Keeps both /calculator/ and /calculators/ routes.
-- Restores 20 Learn articles.
+- Changes homepage metric from 10+ calculators to 11 calculators.
+- Displays all 11 calculator cards on homepage.
+- Keeps calculator/analyzer logic unchanged.
+- Keeps existing routes unchanged.
 
 Commit:
-DealCalc v12 Final Polish Internal Linking
-
-After deploy:
-- Submit sitemap.xml in Search Console.
-- Request indexing for homepage, /learn/, AI Analyzer, Rehab Calculator, Rental Analyzer.
+DealCalc v12 11 Calculator Display Fix
