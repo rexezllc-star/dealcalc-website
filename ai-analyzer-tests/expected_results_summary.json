@@ -1,0 +1,27 @@
+[
+  {
+    "file": "01_houston_cma_retail_overpay.pdf",
+    "expectedStrategy": "Retail overpay check / negotiate or pass",
+    "expectedVerdict": "Overpriced relative to closed comps"
+  },
+  {
+    "file": "02_distressed_wholesale_seller_packet.pdf",
+    "expectedStrategy": "Wholesale / Fix and flip",
+    "expectedVerdict": "Potential deal if contract price is below buyer max"
+  },
+  {
+    "file": "03_duplex_rental_analysis_packet.pdf",
+    "expectedStrategy": "Rental / Buy and hold",
+    "expectedVerdict": "Analyze cash flow, DSCR, cap rate, cash-on-cash"
+  },
+  {
+    "file": "04_vacant_land_flyer_spring_hill.pdf",
+    "expectedStrategy": "Land flip / Builder resale",
+    "expectedVerdict": "Thin margin unless verified resale or builder buyer exists"
+  },
+  {
+    "file": "05_low_data_property_flyer.pdf",
+    "expectedStrategy": "Insufficient data",
+    "expectedVerdict": "Needs more information; do not produce confident recommendation"
+  }
+]
