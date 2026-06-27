@@ -2,8 +2,8 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LVWBTX8RQB"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LVWBTX8RQB');</script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cap Rate Calculator | DealCalc.io</title><meta name="description" content="Calculate cap rate from NOI and property value.">
-<meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="https://www.dealcalc.io/calculators/cap-rate-calculator.html">
+<title>Cash-on-Cash Calculator | DealCalc.io</title><meta name="description" content="Calculate return on actual cash invested.">
+<meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="https://www.dealcalc.io/calculators/cash-on-cash-calculator.html">
 <meta name="theme-color" content="#050814"><style>
 :root{--bg:#050814;--bg2:#0b1220;--panel:#111827;--input:#070d18;--ink:#f8fafc;--muted:#9ca3af;--soft:#cbd5e1;--line:rgba(148,163,184,.22);--brand:#eab94f;--brand2:#f59e0b;--green:#4ade80;--red:#fb7185;--shadow:0 24px 70px rgba(0,0,0,.38)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(59,130,246,.16),transparent 32%),radial-gradient(circle at top right,rgba(234,185,79,.10),transparent 28%),linear-gradient(180deg,#050814,#0b1220 48%,#050814);color:var(--ink)}a{text-decoration:none;color:inherit}
@@ -19,7 +19,7 @@
 <a href="/#calculators" class="active">Calculators</a>
 <a href="/learn.html">Learn</a><a href="/about.html">About</a><a href="/contact.html">Contact</a>
 </div><a href="/tools/ai-deal-analyzer.html" class="dc-cta">Analyze Deal</a></div></nav>
-<main class="dc-page"><div class="dc-hero"><div><span class="dc-kicker">Calculator UI System</span><h1>Cap Rate Calculator</h1><p class="dc-lead">Calculate cap rate from NOI and property value.</p></div></div>
+<main class="dc-page"><div class="dc-hero"><div><span class="dc-kicker">Calculator UI System</span><h1>Cash-on-Cash Calculator</h1><p class="dc-lead">Calculate return on actual cash invested.</p></div></div>
 <div class="dc-layout"><section><div class="dc-card dc-section-card"><div class="dc-card-title"><span class="dc-icon">▣</span>Inputs</div><div class="dc-form-grid">
 <div><label>Value 1</label><input id="a" type="number" value="100000"></div><div><label>Value 2</label><input id="b" type="number" value="75000"></div><div><label>Costs</label><input id="c" type="number" value="10000"></div></div></div><p class="dc-note">This page uses the new aligned DealCalc calculator interface. Formula-specific refinement continues in the next controlled release.</p></section>
 <aside class="dc-results"><div class="dc-card"><div class="dc-card-title"><span class="dc-icon">▣</span>Key Results</div><div class="dc-results-grid"><div class="dc-result-tile"><span>Result</span><b class="gold" id="primary">$0</b></div><div class="dc-result-tile"><span>Net</span><b class="green" id="secondary">$0</b></div><div class="dc-result-tile"><span>Margin</span><b id="third">0%</b></div><div class="dc-result-tile"><span>Score</span><div class="dc-score-ring" id="score">0</div><span id="grade">—</span></div></div></div><div class="dc-card" style="margin-top:16px"><div class="dc-card-title"><span class="dc-icon">◷</span>Summary</div><div id="summary"></div></div><div class="dc-actions"><button class="dc-btn" onclick="runCalc()">Analyze Deal</button><button class="dc-btn secondary" onclick="window.print()">Print</button><button class="dc-btn ghost" onclick="resetDefaults()">Reset</button></div></aside></div></main>
