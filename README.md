@@ -1,12 +1,18 @@
-# DealCalc v12 Calculator Display Fix
+# DealCalc Articles v2.1
 
-Focused homepage correction only.
+GitHub-ready article release package.
 
-Changes:
-- Changes homepage metric from 10+ calculators to 11 calculators.
-- Displays all 11 calculator cards on homepage.
-- Keeps calculator/analyzer logic unchanged.
-- Keeps existing routes unchanged.
+## Upload Instructions
+1. Replace your existing `/articles` folder with the `/articles` folder in this package.
+2. Upload the root documentation files if you want them tracked in the repository.
+3. If using the article sitemap, place `sitemap-articles.xml` at the site root.
+4. Commit changes and allow Vercel to redeploy.
 
-Commit:
-DealCalc v12 11 Calculator Display Fix
+## Article Count
+21 published articles.
+
+## New Article
+- `the-70-percent-rule-explained.html`
+
+## Updated Article
+- `how-to-estimate-rehab-costs.html`
